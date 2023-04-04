@@ -59,6 +59,10 @@ class Arr implements FormatInterface {
 	}
 	 
 
+	function fill(int $index, int $times, string $value = "&nbsp;") {
+		$this->arr = array_fill($index, $times, $value);
+		return $this;
+	}
 
 	/**
 	 * Return count/length

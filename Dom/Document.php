@@ -47,9 +47,7 @@ class Document {
 		return $this->el;
 	}
 
-	function getTag(string $key) {
-		return ($this->el[$key] ?? NULL);
-	}
+	
 
 	/**
 	 * Create (append) element
@@ -103,6 +101,10 @@ class Document {
 	 */
 	function getElements() {
 		return $this->elements;
+	}
+
+	function getTag(string $key) {
+		return ($this->el[$key] ?? NULL);
 	}
 
 	/**
