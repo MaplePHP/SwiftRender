@@ -9,19 +9,21 @@
 
 namespace PHPFuse\Output\Dom;
 
-class Element {
+use BadMethodCallException;
+
+class Element extends Document{
 
 	private $inst;
-	private $element;
+	private $el;
 	private $attr = array();
 	private $snippet;
 	private $value;
 	private $node;
 
 
-	function __construct(Document $inst, string $element, ?string $value, bool $snippet = false) {
-		$this->inst = $inst;
-		$this->element = $element;
+	function __construct(string $el, ?string $value, bool $snippet = false) {
+		//this->inst = $inst;
+		$this->el = $el;
 		$this->value = $value;
 		$this->snippet = $snippet;
 	}
@@ -48,7 +50,7 @@ class Element {
 	}
 
 	/**
-	 * Set element value <elem>[VALUE]</elem>
+	 * Set el value <elem>[VALUE]</elem>
 	 * @param self
 	 */
 	function setValue(?string $value) {
@@ -57,7 +59,7 @@ class Element {
 	}
 
 	/**
-	 * Set element value
+	 * Set el value
 	 * @param string
 	 */
 	function getValue() {
@@ -65,25 +67,13 @@ class Element {
 	}
 
 	/**
-	 * Get element/HTML tag
+	 * Get el/HTML tag
 	 * @return [type] [description]
 	 */
-	function getElement() {
-		return $this->element;
+	function getEl() {
+		return $this->el;
 	}
-
-	function getTag() {
-		return $this->getElement();
-	}
-
-	/**
-	 * Circle back to DOM instrance and execute
-	 * @return string
-	 */
-	function execute(?callable $call = NULL) {
-		return $this->inst->execute($call);
-	}
-
+	
 	/**
 	 * Array attr to string
 	 * @return string
@@ -96,4 +86,22 @@ class Element {
 		}
 		return $attr;
 	}
+
+
+	/*
+	function execute(?callable $call = NULL) {
+		return $this->inst->execute($call);
+	}
+
+	function __call($a, $b) {
+
+		if(method_exists($this->inst, $a)) {
+			return call_user_func_array([$this->inst, $a], $b);
+		} else {
+			throw new BadMethodCallException("The method \"{$a}\" does not exists in \"".get_class($this->inst)."\".", 1);	
+		}
+
+	}
+	 */
+	
 }

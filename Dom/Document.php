@@ -56,7 +56,7 @@ class Document {
 	 * @return self
 	 */
 	function create($element, $value = NULL, ?string $bind = NULL) {
-		$inst = new Element($this, $element, $value);
+		$inst = new Element($element, $value);
 
 		if(!is_null($bind)) {
 			$this->elements[$bind] = $inst;
@@ -74,7 +74,7 @@ class Document {
 	 * @return self
 	 */
 	function createPrepend(string $element, ?string $value = NULL, ?string $bind = NULL) {
-		$inst = new Element($this, $element, $value);
+		$inst = new Element($element, $value);
 		if(is_null($this->elements)) $this->elements = array();
 
 		if(!is_null($bind)) {
@@ -113,6 +113,7 @@ class Document {
 	 * @return string
 	 */
 	function execute(?callable $call = NULL) {
+		$this->html = "";
 		if(is_array($this->elements)) {
 			$this->build($this->elements, $call);
 		}
@@ -134,16 +135,16 @@ class Document {
 	 */
 	private function build(array $arr, ?callable $call = NULL) {
 		foreach($arr as $k => $a) {
-			$hasNoEnding = in_array($a->getElement(), $this::TAG_NO_ENDING);
+			$hasNoEnding = in_array($a->getEl(), $this::TAG_NO_ENDING);
 
 			if(!is_null($call)) $call($a, $k, $hasNoEnding);
 
-			$this->html .= "\t<".$a->getElement().$a->buildAttr().">";
+			$this->html .= "\t<".$a->getEl().$a->buildAttr().">";
 			if(!$hasNoEnding) $this->html .= $a->getValue();
 			if(isset($a->elements)) {
 				$this->build($a->elements, $call);
 			}
-			if(!$hasNoEnding) $this->html .= "</".$a->getElement().">\n";
+			if(!$hasNoEnding) $this->html .= "</".$a->getEl().">\n";
 			if($hasNoEnding) $this->html .= "\n";
 		}
 	}

@@ -53,7 +53,7 @@ class Traverse {
 	}
 
 	function count() {
-		return count($this->raw);
+		return (is_array($this->raw) ? count($this->raw) : 0);
 	}
 
 	/**
