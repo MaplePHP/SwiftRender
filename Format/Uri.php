@@ -9,7 +9,7 @@
 
 namespace PHPFuse\Output\Format;
 
-class Uri implements FormatInterface {
+class Uri extends Str implements FormatInterface {
 
 	protected $value;
 
@@ -64,7 +64,7 @@ class Uri implements FormatInterface {
 	 * @return self
 	 */
 	function formatSlug() {
-		$this->clearBreaks("-")->trim()->replaceSpecialChar()->trimSpaces()->replaceSpaces("-")->tolower();
+		$this->clearBreaks("-")->trim()->replaceSpecialChar()->trimSpaces()->replaceSpaces("-")->toLower();
 	    $this->value = preg_replace("/[^a-z0-9\s-]/", "", $this->value);
 	    return $this;
 	}
