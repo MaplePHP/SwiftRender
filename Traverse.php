@@ -80,6 +80,12 @@ class Traverse {
 		return $this;
 	}
 
+
+	function fallback(string $fallback) {
+		if(!$this->row) $this->row = $fallback;
+		return $this;
+	}
+
 	/**
 	 * Get/return result
 	 * @return inherit

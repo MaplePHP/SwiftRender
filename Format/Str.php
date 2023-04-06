@@ -26,6 +26,11 @@ class Str implements FormatInterface {
 		return $inst;
 	}
 
+	function fallback(string $fallback) {
+		if(!$this->value) $this->value = $fallback;
+		return $this;
+	}
+
 	function get() {
 		return $this->value;
 	}
