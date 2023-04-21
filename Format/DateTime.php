@@ -8,12 +8,12 @@
  */
 namespace PHPFuse\Output\Format;
 
-class DateTime extends \DateTime implements FormatInterface {
+use DateTime as MainDateTime;
+use DateTimeZone;
 
-	private $_lang;
+class DateTime extends MainDateTime implements FormatInterface {
 
 	const DEFAULT_LANG = "sv"; // Default
-
 	const LANG = [
 		"sv" => [
 			"Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Okt", "Sep", "Nov", "Dec", 
@@ -27,43 +27,60 @@ class DateTime extends \DateTime implements FormatInterface {
 		]
 	];
 
-	static function value($value): \DateTime 
+	private $lang;
+	private $translations = array();
+
+
+	function __construct(string $datetime = "now", ?DateTimeZone $timezone = null) {
+		parent::__construct($datetime, $timezone);
+		$this->translations = static::LANG;
+	}
+
+	static function value(string $value): \DateTime 
 	{
-		return new \DateTime($value);
+		$inst = new self($value);
+		return $inst;
 	}
 
-	function get($key) {
-		return $this->format();
+	function getTranslations() {
+		return $this->translations;
 	}
-
-	private function _langKey() {
-		return (!is_null($this->_lang)) ? $this->_lang : $this::DEFAULT_LANG;
-
-	}
-
-	function translate($lang) {
-		$this->_lang = $lang;
+	
+	function setTranslation(string $key, array $arr) {
+		$this->translations[$key] = $arr;
 		return $this;
 	}
 
-	private function _translate(string $format) {
-
-		$k = $this->_langKey();		
-		if(isset($this::LANG[$k])) {
-			return str_replace($this::LANG['en'], $this::LANG[$k], $format);
+	function setLanguage(string $lang) {
+		if(!isset($this->translations[$lang])) {
+			throw new \Exception("Translation for the language \"{$lang}\" does not exists! You can add custom translation with @setTranslation method.", 1);
 		}
-		return $format;
-	}
-
-	function format($key) {
-		$format = parent::format($key);
-		return $this->_translate($format);
+		$this->lang = $lang;
+		return $this;
 	}
 
 	function clone() {
 		return clone $this;
 	}
 
-}
+	function format($format): string 
+	{
+		$format = parent::format($format);
+		return $this->translate($format);
+	}
 
-?>
+
+	private function langKey() {
+		return (!is_null($this->lang)) ? $this->lang : $this::DEFAULT_LANG;
+	}
+
+	private function translate(string $format) {
+
+		$k = $this->langKey();		
+		if(isset($this::LANG[$k])) {
+			return str_replace($this::LANG['en'], $this::LANG[$k], $format);
+		}
+		return $format;
+	}
+
+}

@@ -16,6 +16,6 @@ interface FormatInterface {
 	 * @param  array  $arr
 	 * @return self
 	 */
-	public static function value($value);
+	public static function value(string $value);
 
 }
