@@ -4,14 +4,13 @@
  * @Author: 	Daniel Ronkainen
  * @Licence: 	The MIT License (MIT), Copyright © Daniel Ronkainen
  				Don't delete this comment, its part of the license.
- * @Version: 	1.0.0
  */
 
 namespace PHPFuse\Output;
 
 use PHPFuse\Output\Format;
 
-class Traverse {
+class Traverse extends dynamicDataAbstract {
 
 	protected $row; // Use row to access current instance (access inst/object)
 	protected $raw; // Use raw to access current instance data (access array)
@@ -19,7 +18,7 @@ class Traverse {
 	/**
 	 * Init intance
 	 * @param  array|object $data [description]
-	 * @return [type]       [description]
+	 * @return static
 	 */
 	static function value($data, $raw = NULL) {
 		$inst = new static();
@@ -30,7 +29,7 @@ class Traverse {
 		}
 		return $inst;
 	}
-
+	
 	/**
 	 * Traverse factory 
 	 * If you want 
@@ -50,10 +49,6 @@ class Traverse {
 			}
 		}
 		return $this;
-	}
-
-	function count() {
-		return (is_array($this->raw) ? count($this->raw) : 0);
 	}
 
 	/**
@@ -80,8 +75,20 @@ class Traverse {
 		return $this;
 	}
 
+	/**
+	 * Count if row is array. Can be used to validate before @fetch method
+	 * @return int
+	 */
+	function count() {
+		return (is_array($this->raw) ? count($this->raw) : 0);
+	}
 
-	function fallback(string $fallback) {
+	/**
+	 * Create a fallback value if value is Empty/Null/0/false
+	 * @param  string $fallback
+	 * @return mixed
+	 */
+	function fallback(mixed $fallback) {
 		if(!$this->row) $this->row = $fallback;
 		return $this;
 	}

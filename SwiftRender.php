@@ -288,7 +288,7 @@ class SwiftRender {
 	 * @param  array  $args  Pass arguments to template
 	 * @return callable
 	 */
-	final private function build(string $file, array $args = array()): callable 
+	private function build(string $file, array $args = array()): callable 
 	{
 		$this->arguments = $args;
 		$func = function($a) use($file, $args) {
