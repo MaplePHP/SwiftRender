@@ -18,7 +18,7 @@ class Json implements JsonInterface {
 	 * @param  array  $array
 	 * @return self
 	 */
-	public function merge(array $array) 
+	public function merge(array $array): self 
 	{
 		$this->data = array_merge($this->data, $array);
 		return $this;
@@ -29,7 +29,7 @@ class Json implements JsonInterface {
 	 * @param  array  $array
 	 * @return self
 	 */
-	public function set($key, $value) 
+	public function set($array): self
 	{
 		$this->data = $array;
 		return $this;
@@ -40,7 +40,7 @@ class Json implements JsonInterface {
 	 * @param  array  $array
 	 * @return self
 	 */
-	public function mergeTo(string $key, array $array) 
+	public function mergeTo(string $key, array $array): self
 	{
 		if(empty($this->data[$key])) {
 			$this->data = array_merge($this->data, [$key => $array]);
@@ -57,7 +57,7 @@ class Json implements JsonInterface {
 	 * @param mixed $value Set array value
 	 * @return self
 	 */
-	public function add(string $key, $value) 
+	public function add(string $key, $value): self
 	{
 		$this->data = array_merge($this->data, [$key => $value]);
 		return $this;
@@ -109,7 +109,8 @@ class Json implements JsonInterface {
 	 * @param  integer $depth   Set the maximum depth. Must be greater than zero
 	 * @return json/bool (bool if could not load json data)
 	 */
-	public function encode($options = JSON_UNESCAPED_UNICODE, $depth = 512) {
+	public function encode($options = JSON_UNESCAPED_UNICODE, $depth = 512): string
+	{
 		return self::encodeData($this->data, $options, $depth);
 	}
 
@@ -119,7 +120,8 @@ class Json implements JsonInterface {
 	 * @param  boolean $assoc 	When TRUE, returned objects will be converted into associative arrays.
 	 * @return array/bool 		Resturns as array or false if error occoured.
 	 */
-	public function decode($json, $assoc = true) {
+	public function decode($json, $assoc = true): object 
+	{
 		if($array = json_decode($json, $assoc)) {
 			return $array;
 		}
