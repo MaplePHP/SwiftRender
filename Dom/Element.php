@@ -11,7 +11,7 @@ namespace PHPFuse\Output\Dom;
 
 use BadMethodCallException;
 
-class Element extends Document{
+class Element extends Document {
 
 	private $inst;
 	private $el;
@@ -26,6 +26,16 @@ class Element extends Document{
 		$this->el = $el;
 		$this->value = $value;
 		$this->snippet = $snippet;
+	}
+	
+	/**
+	 * Overwrite the current element
+	 * @param string $el HTML Tag name
+	 */
+	function setElement(string $el): self
+	{
+		$this->el = $el;
+		return $this;
 	}
 
 	/**
@@ -45,9 +55,22 @@ class Element extends Document{
 	 * @return self
 	 */
 	function attrArr(?array $arr) {
-		$this->attr = array_merge($this->attr, $arr);
+		if(is_array($arr)) $this->attr = array_merge($this->attr, $arr);
 		return $this;
 	}
+
+	function attrAddTo(string $key, string $value, string $sep = " ") {
+		
+
+		if(isset($this->attr[$key])) {
+			$this->attr[$key] .= "{$sep}{$value}";
+		} else {
+			$this->attr[$key] = $value;
+		}
+
+		return $this;
+	}
+
 
 	/**
 	 * Set el value <elem>[VALUE]</elem>
@@ -85,6 +108,13 @@ class Element extends Document{
 			if(!is_null($v)) $attr .= "=\"{$v}\"";
 		}
 		return $attr;
+	}
+
+	function withElement() {
+		if(!is_null($this->el)) {
+			return clone $this;
+		}
+		return false;
 	}
 
 

@@ -16,7 +16,7 @@ One time setup to use through the application.
 ```php
 
 use PHPFuse\Output\SwiftRender;
-use PHPFuse\Output\Format;
+use PHPFuse\DTO\Format;
 
 $swift = new SwiftRender();
 

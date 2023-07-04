@@ -9,9 +9,13 @@
 
 namespace PHPFuse\Output;
 
+use PHPFuse\Container\Interfaces\ContainerInterface;
 use Exception;
-use PHPFuse\Output\Format\Str; 
-use PHPFuse\Output\Traverse;
+
+use PHPFuse\DTO\Format\Str; 
+use PHPFuse\DTO\Traverse;
+use PHPFuse\Output\Dom\Document;
+use PHPFuse\Output\Dom\Element;
 
 class SwiftRender {
 
@@ -30,11 +34,31 @@ class SwiftRender {
 	private $bind;
 	private $bindView;
 	private $bindArr;
+	private $container;
 
 	/**
 	 * Used to build output buffer;
 	 */
 	function __construct() {
+		
+	}
+
+	/**
+	 * Pass a container class instance of ContainerInterface, that can be used with in your templates
+	 * @param ContainerInterface $container
+	 */
+	function setContainer(ContainerInterface $container): void 
+	{
+		$this->container = $container;
+	}
+
+	/**
+	 * Get container instance
+	 * @return ContainerInterface
+	 */
+	function getContainer(): ContainerInterface
+	{
+		return $this->container;
 	}
 
 	/**
@@ -114,10 +138,10 @@ class SwiftRender {
 	 * @param  string $file Filename
 	 * @return self
 	 */
-	function setIndex(string $file): self 
+	function setIndex(string|callable $file): self 
 	{
-		if(is_null($this->file)) $this->setFile($file);
-		$func = $this->build($this->file);
+		if(is_null($this->file) && is_string($file)) $this->setFile($file);
+		$func = $this->build($file);
 		$this->index = $func;
 		return $this;
 	}
@@ -140,12 +164,20 @@ class SwiftRender {
 	 * @param  array  $args Pass on argummets to template
 	 * @return self
 	 */
-	function setView(string $file, array $args = array()): self 
+	function setView(string|callable $file, array $args = array()): self 
 	{
-		if(is_null($this->file)) $this->setFile($file);
-		$func = $this->build($this->file, $args);
+		if(is_null($this->file) && is_string($file)) $this->setFile($file);
+		$func = $this->build($file, $args);
 		$this->view = $func;
 		return $this;
+	}
+
+
+	function withView(string $file, array $args = array()): self 
+	{
+		$inst = clone $this;
+		$inst->setView($file, $args);
+		return $inst->view();
 	}
 
 	/**
@@ -230,6 +262,9 @@ class SwiftRender {
 		return $this;
 	}
 
+	
+
+
 	/**
 	 * Prepare partial for return
 	 * @param  string $key select partial to read
@@ -288,19 +323,27 @@ class SwiftRender {
 	 * @param  array  $args  Pass arguments to template
 	 * @return callable
 	 */
-	private function build(string $file, array $args = array()): callable 
+	private function build(string|callable $file, array $args = array()): callable 
 	{
 		$this->arguments = $args;
 		$func = function($a) use($file, $args) {
 			if(($dir = ($this->dir[$this->get] ?? NULL)) || !is_null($dir)) {
-				$filePath = "{$dir}{$file}.{$this->ending}";
-				if(is_string($filePath) && is_file($filePath)) {
-					if(is_array($a) && count($a) > 0) $args = $a;
-					$obj = Traverse::value($args);
-					include($filePath);
+
+				if(is_callable($file)) {
+					$out = $file($this, $args);
+					if(is_string($out)) echo $out;
 
 				} else {
-					throw new Exception("Could not require template file add {$this->get}: {$dir}{$file}.", 1);
+
+					$filePath = "{$dir}{$file}.{$this->ending}";
+					if(is_string($filePath) && is_file($filePath)) {
+						if(is_array($a) && count($a) > 0) $args = $a;
+						$obj = Traverse::value($args);
+						include($filePath);
+
+					} else {
+						throw new Exception("Could not require template file add {$this->get}: {$dir}{$file}.", 1);
+					}
 				}
 
 			} else {
@@ -332,6 +375,28 @@ class SwiftRender {
 		return (bool)(in_array($key, $this::VIEWS) && isset($this->{$key}));
 	}
 
+	function dom(string $key): Document
+	{
+		return Document::dom($key);
+	}
+
+	function createTag(string $element, string $value, ?array $attr = NULL) {
+		$inst = new Document();
+		$el = $inst->create($element, $value)->attrArr($attr);
+		return $el;
+	}
+
+	function isDoc($el): bool 
+	{
+		return (bool)($el instanceof Document || $el instanceof Element);
+	}
+
+	function isEl($el): bool 
+	{
+		return (bool)($el instanceof Element);
+	}
+
+	
 	/**
 	 * Check if view exists at row
 	 * @param  string $key

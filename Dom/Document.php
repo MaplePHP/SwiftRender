@@ -15,8 +15,8 @@ class Document {
 		"meta", "link", "img", "br", "hr", "input", "keygen", "param", "source", "track", "embed"
 	];
 
-	private $html = "";
-	private $elements;
+	private $html;
+	protected $elements;
 	private $el;
 
 	private static $inst;
@@ -114,6 +114,7 @@ class Document {
 	 */
 	function execute(?callable $call = NULL) {
 		$this->html = "";
+		if(is_null($this->elements) && ($inst = $this->withElement())) $this->elements[] = $inst;
 		if(is_array($this->elements)) {
 			$this->build($this->elements, $call);
 		}
@@ -121,11 +122,17 @@ class Document {
 	}
 
 	/**
-	 * Get get Dom/document (You need to execute first!)
+	 * Get get Dom/document (Will only trigger execute once per instance)
 	 * @return string
 	 */
 	function get() {
+		if(is_null($this->html)) $this->execute();
 		return $this->html;
+	}
+
+
+	function __toString() {
+		return $this->get();
 	}
 
 	/**
