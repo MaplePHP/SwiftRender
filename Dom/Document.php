@@ -4,7 +4,6 @@
  * @Author: 	Daniel Ronkainen
  * @Licence: 	The MIT License (MIT), Copyright © Daniel Ronkainen
  				Don't delete this comment, its part of the license.
- * @Version: 	1.0.0
  */
 
 namespace PHPFuse\Output\Dom;
@@ -15,10 +14,9 @@ class Document {
 		"meta", "link", "img", "br", "hr", "input", "keygen", "param", "source", "track", "embed"
 	];
 
-	private $html;
 	protected $elements;
+	private $html;
 	private $el;
-
 	private static $inst;
 
 	/**
@@ -135,6 +133,7 @@ class Document {
 		return $this->get();
 	}
 
+
 	/**
 	 * Build document
 	 * @param  array         $arr  elements
@@ -143,22 +142,16 @@ class Document {
 	private function build(array $arr, ?callable $call = NULL) {
 		foreach($arr as $k => $a) {
 			$hasNoEnding = in_array($a->getEl(), $this::TAG_NO_ENDING);
-
 			if(!is_null($call)) $call($a, $k, $hasNoEnding);
 
-			$this->html .= "\t<".$a->getEl().$a->buildAttr().">";
+			if(!$a->hideTagValid()) $this->html .= "\t<".$a->getEl().$a->buildAttr().">";
 			if(!$hasNoEnding) $this->html .= $a->getValue();
 			if(isset($a->elements)) {
 				$this->build($a->elements, $call);
 			}
-			if(!$hasNoEnding) $this->html .= "</".$a->getEl().">\n";
-			if($hasNoEnding) $this->html .= "\n";
+			if(!$hasNoEnding && !$a->hideTagValid()) $this->html .= "</".$a->getEl().">\n";
+			if($hasNoEnding && !$a->hideTagValid()) $this->html .= "\n";
 		}
 	}
 
 }
-
-
-
-
-?>

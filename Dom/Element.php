@@ -19,6 +19,7 @@ class Element extends Document {
 	private $snippet;
 	private $value;
 	private $node;
+	private $hideEmptyTag = false;
 
 
 	function __construct(string $el, ?string $value, bool $snippet = false) {
@@ -59,24 +60,55 @@ class Element extends Document {
 		return $this;
 	}
 
-	function attrAddTo(string $key, string $value, string $sep = " ") {
-		
+	/**
+	 * Hide html tag if its value is empty
+	 * @param  bool   $bool
+	 * @return self
+	 */
+	function hideEmptyTag(bool $bool): self
+	{
+		$this->hideEmptyTag = $bool;
+		return $this;
+	}
 
+	/**
+	 * Validate hide tag value
+	 * @return bool
+	 */
+	protected function hideTagValid(): bool 
+	{
+		return (bool)(($this->hideEmptyTag && !$this->value));
+	}
+	
+	/**
+	 * Add value to attr
+	 * @param  string $key
+	 * @param  string $value
+	 * @param  string $sep
+	 * @return self
+	 */
+	function attrAdd(string $key, string $value, string $sep = " "): self 
+	{
 		if(isset($this->attr[$key])) {
 			$this->attr[$key] .= "{$sep}{$value}";
 		} else {
 			$this->attr[$key] = $value;
 		}
-
 		return $this;
 	}
-
+	
+	// Same as above
+	function attrAddTo(string $key, string $value, string $sep = " "): self 
+	{
+		return $this->attrAdd($key, $value, $sep);
+	}
 
 	/**
 	 * Set el value <elem>[VALUE]</elem>
 	 * @param self
 	 */
-	function setValue(?string $value) {
+	function setValue(?string $value): self 
+	{
 		$this->value = $value;
 		return $this;
 	}
@@ -85,23 +117,26 @@ class Element extends Document {
 	 * Set el value
 	 * @param string
 	 */
-	function getValue() {
-		return $this->value;
+	function getValue(): string 
+	{
+		return (string)$this->value;
 	}
 
 	/**
 	 * Get el/HTML tag
-	 * @return [type] [description]
+	 * @return string
 	 */
-	function getEl() {
-		return $this->el;
+	function getEl(): string 
+	{
+		return (string)$this->el;
 	}
 	
 	/**
 	 * Array attr to string
 	 * @return string
 	 */
-	function buildAttr() {
+	protected function buildAttr(): string 
+	{
 		$attr = "";
 		if(count($this->attr) > 0) foreach($this->attr as $k => $v) {
 			$attr .= " {$k}";
@@ -110,7 +145,12 @@ class Element extends Document {
 		return $attr;
 	}
 
-	function withElement() {
+	/**
+	 * Clone/Static
+	 * @return static|false
+	 */
+	function withElement()
+	{
 		if(!is_null($this->el)) {
 			return clone $this;
 		}
