@@ -8,9 +8,15 @@ use PHPFuse\Output\Interfaces\JsonInterface;
 
 class Json implements JsonInterface {
 
-	protected $data = array("status" => 0, "error" => 0);
+	public $data = array("status" => 0, "error" => 0);
+	public $fields = array();
 	
 	function __construct() {
+	}
+
+
+	function __toString() {
+		return $this->encode();
 	}
 
 	/**
@@ -63,13 +69,65 @@ class Json implements JsonInterface {
 		return $this;
 	}
 
+
+	/**
+	 * Merge string to json array
+	 * @param string $key   Set array key
+	 * @param mixed $value Set array value
+	 * @return self
+	 */
+	public function item(...$args): array
+	{
+		$key = NULL;
+		if(isset($args[0]) && !is_array($args[0])) {
+			$key = array_shift($args);
+			if(count($args) === 1) $args = $args[0];
+		}
+		$argumnets = (!is_null($key)) ? [[$key => $args]] : [...$args];
+		$this->data = array_merge($this->data, $argumnets);
+		return reset($argumnets);
+	}
+
+	/**
+	 * Merge string to json array
+	 * @param string $key   Set array key
+	 * @param mixed $value Set array value
+	 * @return self
+	 */
+	public function field($key, $args): self
+	{
+
+
+		if(is_array($key)) {
+			$key = key($key);
+			$this->fields = array_merge($this->fields, [$key => [
+				"type" => $key,
+				...$args
+			]]);
+		} else {
+
+			$this->fields = array_merge($this->fields, [$key => $args]);
+		}
+		
+		
+		return $this;
+	}
+
+	public function form($fields): self
+	{
+		$this->fields = array_merge($this->fields, $fields);
+		return $this;
+	}
+
 	/**
 	 * Reset
 	 * @return void
 	 */
-	public function reset(): void 
+	public function reset(?array $new = NULL): void 
 	{
-		$this->data = array("status" => 0, "error" => 0);
+		if(is_null($new)) $new = array("status" => 0, "error" => 0);
+
+		$this->data = $new;
 	}
 	
 	/**
