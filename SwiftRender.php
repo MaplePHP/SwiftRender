@@ -171,8 +171,13 @@ class SwiftRender {
 		$this->view = $func;
 		return $this;
 	}
-
-
+	
+	/**
+	 * Keep prev view immutable and create a new one.
+	 * @param  string $file [description]
+	 * @param  array  $args [description]
+	 * @return static
+	 */
 	function withView(string $file, array $args = array()): self 
 	{
 		$inst = clone $this;
@@ -187,12 +192,29 @@ class SwiftRender {
 	 * @param  array  $args Pass on argummets to template
 	 * @return self
 	 */
-	function setPartial(string $key, array $args = array()): self 
+	function setPartial(string $key, string|array $a = array(), array $b = array()): self 
 	{
+		if(is_array($a)) {
+			$b = $a; 
+			$partial = $key;
+		} else {
+			$partial = $a;
+		}
+
 		if(is_null($this->file)) $this->setFile($key);
-		$func = $this->build($this->file, $args);
-		$this->partial[$key] = $func;
+		$func = $this->build($this->file, $b);
+		$this->partial[$partial][] = $func;
 		return $this;
+	}
+
+	/**
+	 * Unset a setted partial
+	 * @param  string $key Partal key, example: ("sidebar", "breadcrumb")
+	 * @return void
+	 */
+	function unsetPartial($key): void 
+	{
+		if(isset($this->partial[$key])) unset($this->partial[$key]);
 	}
 	
 	/**
@@ -262,9 +284,6 @@ class SwiftRender {
 		return $this;
 	}
 
-	
-
-
 	/**
 	 * Prepare partial for return
 	 * @param  string $key select partial to read
@@ -298,8 +317,9 @@ class SwiftRender {
 
 		ob_start();
 		if(!is_null($this->arg)){
-			if(is_array($output)) {				
-				if(isset($output[$this->arg])) $output[$this->arg]($args);
+			if(is_array($output)) {
+				//if(isset($output[$this->arg])) $output[$this->arg]($args);
+				if(isset($output[$this->arg])) foreach($output[$this->arg] as $part) $part($args);
 			}
 		} else {
 			if(is_null($output)) {
@@ -375,11 +395,21 @@ class SwiftRender {
 		return (bool)(in_array($key, $this::VIEWS) && isset($this->{$key}));
 	}
 
+	/**
+	 * Check if view exists at row
+	 * @param  string $key
+	 * @return bool
+	 */
+	private function existAtGet(string $key): bool
+	{
+		return (bool)(isset($this->{$key}) && $this->get === $key);
+	}
+
+	/*
 	function dom(string $key): Document
 	{
 		return Document::dom($key);
 	}
-
 	function createTag(string $element, string $value, ?array $attr = NULL) {
 		$inst = new Document();
 		$el = $inst->create($element, $value)->attrArr($attr);
@@ -395,17 +425,7 @@ class SwiftRender {
 	{
 		return (bool)($el instanceof Element);
 	}
-
-	
-	/**
-	 * Check if view exists at row
-	 * @param  string $key
-	 * @return bool
-	 */
-	private function existAtGet(string $key): bool
-	{
-		return (bool)(isset($this->{$key}) && $this->get === $key);
-	}
+	*/
 
 	
 }
