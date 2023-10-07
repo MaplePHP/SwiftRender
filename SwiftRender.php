@@ -14,8 +14,8 @@ use Exception;
 
 use PHPFuse\DTO\Format\Str; 
 use PHPFuse\DTO\Traverse;
-use PHPFuse\Output\Dom\Document;
-use PHPFuse\Output\Dom\Element;
+//use PHPFuse\Output\Dom\Document;
+//use PHPFuse\Output\Dom\Element;
 
 class SwiftRender {
 
@@ -42,6 +42,23 @@ class SwiftRender {
 	function __construct() {
 		
 	}
+
+
+	/**
+     * This will make shortcuts to container.
+     * @param  string $m [description]
+     * @param  string $a [description]
+     * @return ContainerInterface
+     */
+    function __call($m, $a) {
+    	if(!is_null($this->container)) {
+	        if($this->container->has($m)) {
+	            return $this->container->get($m, $a);
+	        } else {
+	            throw new BadMethodCallException('The method "'.$m.'" does not exist in the Container or the Class "'.static::class.'"!', 1);
+	        }
+        }
+    }
 
 	/**
 	 * Pass a container class instance of ContainerInterface, that can be used with in your templates
