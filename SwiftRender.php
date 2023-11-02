@@ -10,12 +10,12 @@
 namespace PHPFuse\Output;
 
 use PHPFuse\Container\Interfaces\ContainerInterface;
-use Exception;
+use Exception, BadMethodCallException;
 
 use PHPFuse\DTO\Format\Str; 
 use PHPFuse\DTO\Traverse;
-//use PHPFuse\Output\Dom\Document;
-//use PHPFuse\Output\Dom\Element;
+use PHPFuse\Output\Dom\Document;
+use PHPFuse\Output\Dom\Element;
 
 class SwiftRender {
 
@@ -420,6 +420,26 @@ class SwiftRender {
 	private function existAtGet(string $key): bool
 	{
 		return (bool)(isset($this->{$key}) && $this->get === $key);
+	}
+
+	function dom(string $key): Document
+	{
+		return Document::dom($key);
+	}
+	function createTag(string $element, string $value, ?array $attr = NULL) {
+		$inst = new Document();
+		$el = $inst->create($element, $value)->attrArr($attr);
+		return $el;
+	}
+
+	function isDoc($el): bool 
+	{
+		return (bool)($el instanceof Document || $el instanceof Element);
+	}
+
+	function isEl($el): bool 
+	{
+		return (bool)($el instanceof Element);
 	}
 
 	/*
