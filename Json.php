@@ -9,6 +9,21 @@ use PHPFuse\Output\Interfaces\JsonInterface;
 
 class Json implements JsonInterface
 {
+
+    const ERROR_MESSAGES = [
+        JSON_ERROR_DEPTH => 'The maximum stack depth has been exceeded',
+        JSON_ERROR_STATE_MISMATCH => 'Invalid or malformed JSON',
+        JSON_ERROR_CTRL_CHAR => 'Control character error, possibly incorrectly encoded',
+        JSON_ERROR_SYNTAX => 'Syntax error',
+        JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded',
+        JSON_ERROR_RECURSION => 'One or more recursive references in the value to be encoded',
+        JSON_ERROR_INF_OR_NAN => 'One or more NAN or INF values in the value to be encoded',
+        JSON_ERROR_UNSUPPORTED_TYPE => 'A value of a type that cannot be encoded was given',
+        JSON_ERROR_INVALID_PROPERTY_NAME => 'A property name that cannot be encoded was given',
+        JSON_ERROR_UTF16 => 'Malformed UTF-16 characters, possibly incorrectly encoded'
+    ];
+
+
     public $data = array("status" => 0, "error" => 0);
     public $fields = array();
 
@@ -59,7 +74,6 @@ class Json implements JsonInterface
         return $this;
     }
 
-
     /**
      * Merge string to json array
      * @param string $key   Set array key
@@ -101,8 +115,6 @@ class Json implements JsonInterface
      */
     public function field($key, $args): self
     {
-
-
         if (is_array($key)) {
             $key = key($key);
             $this->fields = array_merge($this->fields, [$key => [
@@ -202,62 +214,11 @@ class Json implements JsonInterface
      */
     public function validate(): void
     {
-        switch (self::error()) {
-            case JSON_ERROR_DEPTH:
-                throw new \Exception('The maximum stack depth has been exceeded', self::error());
-                break;
-            case JSON_ERROR_STATE_MISMATCH:
-                throw new \Exception('Invalid or malformed JSON', self::error());
-                break;
-            case JSON_ERROR_CTRL_CHAR:
-                throw new \Exception('Control character error, possibly incorrectly encoded', self::error());
-                break;
-            case JSON_ERROR_SYNTAX:
-                throw new \Exception('Syntax error', self::error());
-                break;
-            case JSON_ERROR_UTF8:
-                throw new \Exception('Malformed UTF-8 characters, possibly incorrectly encoded', self::error());
-                break;
-            case JSON_ERROR_RECURSION:
-                throw new \Exception('One or more recursive references in the value to be encoded', self::error());
-                break;
-            case JSON_ERROR_INF_OR_NAN:
-                throw new \Exception('One or more NAN or INF values in the value to be encoded', self::error());
-                break;
-            case JSON_ERROR_UNSUPPORTED_TYPE:
-                throw new \Exception('A value of a type that cannot be encoded was given', self::error());
-                break;
-            case JSON_ERROR_INVALID_PROPERTY_NAME:
-                throw new \Exception('A property name that cannot be encoded was given', self::error());
-                break;
-            case JSON_ERROR_UTF16:
-                throw new \Exception('Malformed UTF-16 characters, possibly incorrectly encoded', self::error());
-                break;
+        $error = (static::ERROR_MESSAGES[self::error()] ?? null);
+        if (!is_null($error)) {
+            throw new \Exception($error, self::error());
         }
-    }
-
-    /**
-     * Json encode data
-     * @param  array  $json     array to json
-     * @param  opt  $flag       read php.net (or use the default)
-     * @param  int $depth       read php.net
-     * @return string|null
-     */
-    public static function encodeData(array $json, $flag = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
-    {
-        if (is_array($json) && count($json) > 0 && ($encode = json_encode($json, $flag, $depth))) {
-            return $encode;
-        }
-        return null;
-    }
-
-    /**
-     * Get last json error
-     * @return int
-     */
-    public static function error(): int
-    {
-        return json_last_error();
+        throw new \Exception('An unexpected Json error has occurred', self::error());
     }
 
     /**
@@ -277,5 +238,29 @@ class Json implements JsonInterface
             }
         }
         return $set;
+    }
+
+    /**
+     * Json encode data
+     * @param  array  $json     array to json
+     * @param  opt  $flag       read php.net (or use the default)
+     * @param  int $depth       read php.net
+     * @return string|null
+     */
+    final protected static function encodeData(array $json, $flag = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
+    {
+        if (is_array($json) && count($json) > 0 && ($encode = json_encode($json, $flag, $depth))) {
+            return $encode;
+        }
+        return null;
+    }
+    
+    /**
+     * Get last json error
+     * @return int
+     */
+    final protected static function error(): int
+    {
+        return json_last_error();
     }
 }

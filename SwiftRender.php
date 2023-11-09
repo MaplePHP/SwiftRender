@@ -45,20 +45,19 @@ class SwiftRender
     {
     }
 
-
     /**
      * This will make shortcuts to container.
      * @param  string $m [description]
      * @param  string $a [description]
      * @return ContainerInterface
      */
-    public function __call($m, $a)
+    public function __call($method, $args)
     {
         if (!is_null($this->container)) {
-            if ($this->container->has($m)) {
-                return $this->container->get($m, $a);
+            if ($this->container->has($method)) {
+                return $this->container->get($method, $args);
             } else {
-                throw new BadMethodCallException('The method "'.$m.'" does not exist in the Container '.
+                throw new BadMethodCallException('The method "'.$method.'" does not exist in the Container '.
                     'or the Class "'.static::class.'"!', 1);
             }
         }
@@ -212,24 +211,23 @@ class SwiftRender
 
     /**
      * Create a partial view
-     * @param  string $key  Partal key, example: ("sidebar", "breadcrumb")
-     * @param  string $file Filename
-     * @param  array  $args Pass on argummets to template
-     * @return self
+     * @param string $keyA Filename/key
+     * @param array  $keyB Args/filename
+     * @param array  $keyC Args
      */
-    public function setPartial(string $key, string|array $a = array(), array $b = array()): self
+    public function setPartial(string $keyA, string|array $keyB = array(), array $keyC = array()): self
     {
-        if (is_array($a)) {
-            $b = $a;
-            $partial = $key;
+        if (is_array($keyB)) {
+            $keyC = $keyB;
+            $partial = $keyA;
         } else {
-            $partial = $a;
+            $partial = $keyB;
         }
 
         if (is_null($this->file)) {
-            $this->setFile($key);
+            $this->setFile($keyA);
         }
-        $func = $this->build($this->file, $b);
+        $func = $this->build($this->file, $keyC);
         $this->partial[$partial][] = $func;
         return $this;
     }
@@ -338,17 +336,7 @@ class SwiftRender
      */
     final public function get(?array $args = null): string
     {
-        if (!is_null($this->bindView)) {
-            if (($b = $this->existAtGet("buffer")) || ($v = $this->existAtGet("index"))) {
-                if ($b) {
-                    $this->buffer = $this->bindView;
-                }
-                if ($v) {
-                    $this->view = $this->bindView;
-                }
-            }
-        }
-
+        $this->buildView();
         $output = $this->{$this->get};
 
         // Will merge/replace arguments with current/deafult arguments
@@ -380,6 +368,20 @@ class SwiftRender
         return (string)$output;
     }
 
+    private function buildView(): void
+    {
+        if (!is_null($this->bindView)) {
+            if (($hasBuffer = $this->existAtGet("buffer")) || ($hasIndex = $this->existAtGet("index"))) {
+                if ($hasBuffer) {
+                    $this->buffer = $this->bindView;
+                }
+                if ($hasIndex) {
+                    $this->view = $this->bindView;
+                }
+            }
+        }
+    }
+
     /**
      * Build and Contain template and data until it's executed,
      * this means that code is prepared and will not take any extra memory if view would not be called.
@@ -390,8 +392,10 @@ class SwiftRender
      */
     private function build(string|callable $file, array $args = array()): callable
     {
+        
         $this->arguments = $args;
-        $func = function ($a) use ($file, $args) {
+        $func = function ($argsFromFile) use ($file, $args) {
+
             if (($dir = ($this->dir[$this->get] ?? null)) || !is_null($dir)) {
                 if (is_callable($file)) {
                     $out = $file($this, $args);
@@ -401,11 +405,12 @@ class SwiftRender
                 } else {
                     $filePath = "{$dir}{$file}.{$this->ending}";
                     if (is_string($filePath) && is_file($filePath)) {
-                        if (is_array($a) && count($a) > 0) {
-                            $args = $a;
+                        if (is_array($argsFromFile) && count($argsFromFile) > 0) {
+                            $args = $argsFromFile;
                         }
                         $obj = Traverse::value($args);
                         include($filePath);
+
                     } else {
                         throw new Exception("Could not require template file add {$this->get}: {$dir}{$file}.", 1);
                     }
@@ -457,18 +462,18 @@ class SwiftRender
     public function createTag(string $element, string $value, ?array $attr = null)
     {
         $inst = new Document();
-        $el = $inst->create($element, $value)->attrArr($attr);
-        return $el;
+        $elem = $inst->create($element, $value)->attrArr($attr);
+        return $elem;
     }
 
-    public function isDoc($el): bool
+    public function isDoc($elem): bool
     {
-        return (bool)($el instanceof Document || $el instanceof Element);
+        return (bool)($elem instanceof Document || $elem instanceof Element);
     }
 
-    public function isEl($el): bool
+    public function isEl($elem): bool
     {
-        return (bool)($el instanceof Element);
+        return (bool)($elem instanceof Element);
     }
 
     /*
