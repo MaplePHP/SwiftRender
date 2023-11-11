@@ -103,7 +103,6 @@ class SwiftRender
 
     /**
      * Set dir path to index files
-     * @param  string $type Template type (index/partial/view)
      * @param  string $dir  Dir path
      * @return self
      */
@@ -116,7 +115,6 @@ class SwiftRender
 
     /**
      * Set dir path to view files
-     * @param  string $type Template type (index/partial/view)
      * @param  string $dir  Dir path
      * @return self
      */
@@ -141,7 +139,6 @@ class SwiftRender
 
     /**
      * Set dir path to partial files
-     * @param  string $type Template type (index/partial/view)
      * @param  string $dir  Dir path
      * @return self
      */
@@ -216,11 +213,10 @@ class SwiftRender
      */
     public function setPartial(string $keyA, string|array $keyB = array(), array $keyC = array()): self
     {
+        $partial = $keyB;
         if (is_array($keyB)) {
             $keyC = $keyB;
             $partial = $keyA;
-        } else {
-            $partial = $keyB;
         }
 
         if (is_null($this->file)) {
@@ -293,7 +289,6 @@ class SwiftRender
 
     /**
      * Prepare buffer for return
-     * @param  boolean $args Overwrite arguments
      * @return self
      */
     public function buffer(): self
@@ -305,7 +300,7 @@ class SwiftRender
     /**
      * Prepare view for return
      * @param  array|null $args Overwrite arguments
-     * @return slef
+     * @return self
      */
     public function view(?array $args = null): self
     {
@@ -370,13 +365,13 @@ class SwiftRender
     private function buildView(): void
     {
         if (!is_null($this->bindView)) {
-            if (($hasBuffer = $this->existAtGet("buffer")) || ($hasIndex = $this->existAtGet("index"))) {
-                if ($hasBuffer) {
-                    $this->buffer = $this->bindView;
-                }
-                if ($hasIndex) {
-                    $this->view = $this->bindView;
-                }
+            $hasBuffer = $this->existAtGet("buffer");
+            $hasIndex = $this->existAtGet("index");
+            if ($hasBuffer) {
+                $this->buffer = $this->bindView;
+            }
+            if ($hasIndex) {
+                $this->view = $this->bindView;
             }
         }
     }
@@ -407,8 +402,7 @@ class SwiftRender
                         if (is_array($argsFromFile) && count($argsFromFile) > 0) {
                             $args = $argsFromFile;
                         }
-                        $obj = Traverse::value($args);
-                        include($filePath);
+                        $this->inclRouterFileData($filePath, Traverse::value($args), $args);
                     } else {
                         throw new Exception("Could not require template file add {$this->get}: {$dir}{$file}.", 1);
                     }
@@ -453,6 +447,19 @@ class SwiftRender
         return (bool)(isset($this->{$key}) && $this->get === $key);
     }
 
+    /**
+     * Include router file with router object data
+     * @param  string $filePath
+     * @param  object $obj
+     * @param  array  $args
+     * @psalm-suppress UnusedParam
+     * @return void
+     */
+    private function inclRouterFileData(string $filePath, object $obj, array $args): void
+    {
+        include($filePath);
+    }
+
     public function dom(string $key): Document
     {
         return Document::dom($key);
@@ -473,26 +480,4 @@ class SwiftRender
     {
         return (bool)($elem instanceof Element);
     }
-
-    /*
-    function dom(string $key): Document
-    {
-        return Document::dom($key);
-    }
-    function createTag(string $element, string $value, ?array $attr = NULL) {
-        $inst = new Document();
-        $el = $inst->create($element, $value)->attrArr($attr);
-        return $el;
-    }
-
-    function isDoc($el): bool
-    {
-        return (bool)($el instanceof Document || $el instanceof Element);
-    }
-
-    function isEl($el): bool
-    {
-        return (bool)($el instanceof Element);
-    }
-    */
 }

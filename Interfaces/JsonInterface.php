@@ -41,11 +41,11 @@ interface JsonInterface
 
     /**
      * Convert json array to json string
-     * @param  Bitmask  $options Bitmask
-     * @param  integer $depth   Set the maximum depth. Must be greater than zero
+     * @param  int  $options Bitmask
+     * @param  int $depth   Set the maximum depth. Must be greater than zero
      * @return json/bool (bool if could not load json data)
      */
-    public function encode($options = JSON_UNESCAPED_UNICODE, $depth = 512): string;
+    public function encode(int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): string;
 
     /**
      * Decode json data

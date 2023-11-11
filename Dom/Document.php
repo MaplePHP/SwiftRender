@@ -30,7 +30,7 @@ class Document
     private $elem;
     private static $inst;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->get();
     }
@@ -50,7 +50,7 @@ class Document
     /**
      * Init DOM instance
      * @param  string $key DOM access key
-     * @return new self
+     * @return self
      */
     public static function dom(string $key)
     {
@@ -121,9 +121,9 @@ class Document
 
     /**
      * Get one element from key
-     * @return Response\Dom\Element
+     * @return Element
      */
-    public function getElement(string $key)
+    public function getElement(string $key): Element
     {
         return ($this->elements[$key] ?? null);
     }

@@ -30,7 +30,7 @@ class Json implements JsonInterface
     }
 
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->encode();
     }
@@ -169,7 +169,7 @@ class Json implements JsonInterface
 
     /**
      * Get data has HTML friendly string
-     * @param  string $str select key (you can use comma sep. to traverse array)
+     * @param  string $key select key (you can use comma sep. to traverse array)
      * @return string
      */
     public function output(string $key): ?string
@@ -183,11 +183,11 @@ class Json implements JsonInterface
 
     /**
      * Convert json array to json string
-     * @param  Bitmask  $options Bitmask
-     * @param  integer $depth   Set the maximum depth. Must be greater than zero
-     * @return json/bool (bool if could not load json data)
+     * @param  int  $options    Bitmask
+     * @param  int  $depth       Set the maximum depth. Must be greater than zero
+     * @return json/bool        (bool if could not load json data)
      */
-    public function encode($options = JSON_UNESCAPED_UNICODE, $depth = 512): string
+    public function encode(int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): string
     {
         return self::encodeData($this->data, $options, $depth);
     }
@@ -240,12 +240,12 @@ class Json implements JsonInterface
 
     /**
      * Json encode data
-     * @param  array  $json     array to json
-     * @param  opt  $flag       read php.net (or use the default)
-     * @param  int $depth       read php.net
+     * @param  array    $json   array to json
+     * @param  int      $flag   read php.net (or use the default)
+     * @param  int      $depth  read php.net
      * @return string|null
      */
-    final protected static function encodeData(array $json, $flag = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
+    final protected static function encodeData(array $json, int $flag = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
     {
         if (is_array($json) && count($json) > 0 && ($encode = json_encode($json, $flag, $depth))) {
             return $encode;
