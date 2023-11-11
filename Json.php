@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 namespace PHPFuse\Output;
@@ -9,8 +8,7 @@ use PHPFuse\Output\Interfaces\JsonInterface;
 
 class Json implements JsonInterface
 {
-
-    const ERROR_MESSAGES = [
+    public const ERROR_MESSAGES = [
         JSON_ERROR_DEPTH => 'The maximum stack depth has been exceeded',
         JSON_ERROR_STATE_MISMATCH => 'Invalid or malformed JSON',
         JSON_ERROR_CTRL_CHAR => 'Control character error, possibly incorrectly encoded',
@@ -254,7 +252,7 @@ class Json implements JsonInterface
         }
         return null;
     }
-    
+
     /**
      * Get last json error
      * @return int

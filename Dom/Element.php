@@ -14,30 +14,28 @@ use BadMethodCallException;
 
 class Element extends Document
 {
-    private $inst;
-    private $el;
+    private $elem;
     private $attr = array();
     private $snippet;
     private $value;
-    private $node;
     private $hideEmptyTag = false;
+    //private $node;
+    //private $inst;
 
-
-    public function __construct(string $el, ?string $value, bool $snippet = false)
+    public function __construct(string $elem, ?string $value, bool $snippet = false)
     {
-        //this->inst = $inst;
-        $this->el = $el;
+        $this->elem = $elem;
         $this->value = $value;
         $this->snippet = $snippet;
     }
 
     /**
      * Overwrite the current element
-     * @param string $el HTML Tag name
+     * @param string $elem HTML Tag name
      */
-    public function setElement(string $el): self
+    public function setElement(string $elem): self
     {
-        $this->el = $el;
+        $this->elem = $elem;
         return $this;
     }
 
@@ -110,7 +108,7 @@ class Element extends Document
     }
 
     /**
-     * Set el value <elem>[VALUE]</elem>
+     * Set elem value <elem>[VALUE]</elem>
      * @param self
      */
     public function setValue(?string $value): self
@@ -120,7 +118,7 @@ class Element extends Document
     }
 
     /**
-     * Set el value
+     * Set elem value
      * @param string
      */
     public function getValue(): string
@@ -129,12 +127,12 @@ class Element extends Document
     }
 
     /**
-     * Get el/HTML tag
+     * Get elem/HTML tag
      * @return string
      */
     public function getEl(): string
     {
-        return (string)$this->el;
+        return (string)$this->elem;
     }
 
     /**
@@ -161,7 +159,7 @@ class Element extends Document
      */
     public function withElement()
     {
-        if (!is_null($this->el)) {
+        if (!is_null($this->elem)) {
             return clone $this;
         }
         return false;

@@ -12,13 +12,40 @@ namespace PHPFuse\Output\Dom;
 class Document
 {
     public const TAG_NO_ENDING = [
-        "meta", "link", "img", "br", "hr", "input", "keygen", "param", "source", "track", "embed"
+        "meta",
+        "link",
+        "img",
+        "br",
+        "hr",
+        "input",
+        "keygen",
+        "param",
+        "source",
+        "track",
+        "embed"
     ];
 
     protected $elements;
     private $html;
-    private $el;
+    private $elem;
     private static $inst;
+
+    public function __toString()
+    {
+        return $this->get();
+    }
+
+    /**
+     * Get get Dom/document (Will only trigger execute once per instance)
+     * @return string
+     */
+    public function get()
+    {
+        if (is_null($this->html)) {
+            $this->execute();
+        }
+        return $this->html;
+    }
 
     /**
      * Init DOM instance
@@ -43,14 +70,12 @@ class Document
     public function bindTag(string $tag, string $key, bool $prepend = false)
     {
         if ($prepend) {
-            $this->el = $this->createPrepend($tag, null, $key);
+            $this->elem = $this->createPrepend($tag, null, $key);
         } else {
-            $this->el = $this->create($tag, null, $key);
+            $this->elem = $this->create($tag, null, $key);
         }
-        return $this->el;
+        return $this->elem;
     }
-
-
 
     /**
      * Create (append) element
@@ -98,9 +123,9 @@ class Document
      * Get one element from key
      * @return Response\Dom\Element
      */
-    public function getElement($k)
+    public function getElement(string $key)
     {
-        return ($this->elements[$k] ?? null);
+        return ($this->elements[$key] ?? null);
     }
 
     /**
@@ -112,7 +137,12 @@ class Document
         return $this->elements;
     }
 
-    public function getTag(string $key)
+    /**
+     * Get html tag
+     * @param  string $key
+     * @return string|null
+     */
+    public function getTag(string $key): ?string
     {
         return ($this->el[$key] ?? null);
     }
@@ -125,8 +155,11 @@ class Document
     public function execute(?callable $call = null)
     {
         $this->html = "";
-        if (is_null($this->elements) && ($inst = $this->withElement())) {
-            $this->elements[] = $inst;
+        if (is_null($this->elements)) {
+            if (method_exists($this, "withElement")) {
+                $inst = $this->withElement();
+                $this->elements[] = $inst;
+            }
         }
         if (is_array($this->elements)) {
             $this->build($this->elements, $call);
@@ -134,53 +167,45 @@ class Document
         return $this->html;
     }
 
-    /**
-     * Get get Dom/document (Will only trigger execute once per instance)
-     * @return string
-     */
-    public function get()
+    protected function elemHasEnding(string $elem): bool
     {
-        if (is_null($this->html)) {
-            $this->execute();
-        }
-        return $this->html;
+        return (bool)(in_array($elem, $this::TAG_NO_ENDING));
     }
-
-
-    public function __toString()
-    {
-        return $this->get();
-    }
-
 
     /**
      * Build document
      * @param  array         $arr  elements
      * @param  callable|null $call Can be used to manipulate element within feed
+     * @return void
      */
-    private function build(array $arr, ?callable $call = null)
+    private function build(array $arr, ?callable $call = null): void
     {
-        foreach ($arr as $k => $a) {
-            $hasNoEnding = in_array($a->getEl(), $this::TAG_NO_ENDING);
-            if (!is_null($call)) {
-                $call($a, $k, $hasNoEnding);
-            }
+        foreach ($arr as $key => $elemObj) {
+            $hasNoEnding = $this->elemHasEnding($elemObj->getEl());
+            $this->buildCallable($elemObj, $key, $hasNoEnding, $call);
 
-            if (!$a->hideTagValid()) {
-                $this->html .= "\t<".$a->getEl().$a->buildAttr().">";
+            if (!$elemObj->hideTagValid()) {
+                $this->html .= "\t<" . $elemObj->getEl() . $elemObj->buildAttr() . ">";
             }
             if (!$hasNoEnding) {
-                $this->html .= $a->getValue();
+                $this->html .= $elemObj->getValue();
             }
-            if (isset($a->elements)) {
-                $this->build($a->elements, $call);
+            if (isset($elemObj->elements)) {
+                $this->build($elemObj->elements, $call);
             }
-            if (!$hasNoEnding && !$a->hideTagValid()) {
-                $this->html .= "</".$a->getEl().">\n";
+            if (!$hasNoEnding && !$elemObj->hideTagValid()) {
+                $this->html .= "</" . $elemObj->getEl() . ">\n";
             }
-            if ($hasNoEnding && !$a->hideTagValid()) {
+            if ($hasNoEnding && !$elemObj->hideTagValid()) {
                 $this->html .= "\n";
             }
+        }
+    }
+
+    private function buildCallable($elemObj, $key, $hasNoEnding, ?callable $call): void
+    {
+        if (!is_null($call)) {
+            $call($elemObj, $key, $hasNoEnding);
         }
     }
 }

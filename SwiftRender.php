@@ -13,7 +13,6 @@ namespace PHPFuse\Output;
 use PHPFuse\Container\Interfaces\ContainerInterface;
 use Exception;
 use BadMethodCallException;
-
 use PHPFuse\DTO\Format\Str;
 use PHPFuse\DTO\Traverse;
 use PHPFuse\Output\Dom\Document;
@@ -51,16 +50,16 @@ class SwiftRender
      * @param  string $a [description]
      * @return ContainerInterface
      */
-    public function __call($method, $args)
+    public function __call($method, $args): ContainerInterface
     {
         if (!is_null($this->container)) {
             if ($this->container->has($method)) {
                 return $this->container->get($method, $args);
-            } else {
-                throw new BadMethodCallException('The method "'.$method.'" does not exist in the Container '.
-                    'or the Class "'.static::class.'"!', 1);
             }
         }
+
+        throw new BadMethodCallException('The method "' . $method . '" does not exist in the Container ' .
+                    'or the Class "' . static::class . '"!', 1);
     }
 
     /**
@@ -392,7 +391,7 @@ class SwiftRender
      */
     private function build(string|callable $file, array $args = array()): callable
     {
-        
+
         $this->arguments = $args;
         $func = function ($argsFromFile) use ($file, $args) {
 
@@ -410,13 +409,12 @@ class SwiftRender
                         }
                         $obj = Traverse::value($args);
                         include($filePath);
-
                     } else {
                         throw new Exception("Could not require template file add {$this->get}: {$dir}{$file}.", 1);
                     }
                 }
             } else {
-                throw new Exception("You need to call @".str_replace("_", "", $this->get).
+                throw new Exception("You need to call @" . str_replace("_", "", $this->get) .
                     "DIR and specify dir path for {$file}.", 1);
             }
         };
