@@ -45,7 +45,7 @@ class Element extends Document
      * @param  string|null $val attr value
      * @return self
      */
-    public function attr(string $key, ?string $val = null)
+    public function attr(string $key, ?string $val = null): self
     {
         $this->attr[$key] = $val;
         return $this;
@@ -56,7 +56,7 @@ class Element extends Document
      * @param  array    [key => value]
      * @return self
      */
-    public function attrArr(?array $arr)
+    public function attrArr(?array $arr): self
     {
         if (is_array($arr)) {
             $this->attr = array_merge($this->attr, $arr);
@@ -81,7 +81,7 @@ class Element extends Document
      */
     protected function hideTagValid(): bool
     {
-        return (bool)(($this->hideEmptyTag && !$this->value));
+        return (($this->hideEmptyTag && !$this->value));
     }
 
     /**
@@ -109,7 +109,8 @@ class Element extends Document
 
     /**
      * Set elem value <elem>[VALUE]</elem>
-     * @param self
+     * @param string|null null value can be used to auto skip HTML tag
+     * @return self
      */
     public function setValue(?string $value): self
     {
@@ -119,7 +120,7 @@ class Element extends Document
 
     /**
      * Set elem value
-     * @param string
+     * @return string
      */
     public function getValue(): string
     {
@@ -132,7 +133,7 @@ class Element extends Document
      */
     public function getEl(): string
     {
-        return (string)$this->elem;
+        return $this->elem;
     }
 
     /**
@@ -154,14 +155,16 @@ class Element extends Document
     }
 
     /**
-     * Clone/Static
-     * @return static|false
+     * With cloned element or new element if is specifed
+     * @param  string|null $elem
+     * @return self
      */
-    public function withElement()
+    public function withElement(?string $elem = null): self
     {
-        if (!is_null($this->elem)) {
-            return clone $this;
+        $inst = clone $this;
+        if (!is_null($elem)) {
+            $inst->elem = $elem;
         }
-        return false;
+        return $inst;
     }
 }

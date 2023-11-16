@@ -121,9 +121,9 @@ class Document
 
     /**
      * Get one element from key
-     * @return Element
+     * @return Element|null
      */
-    public function getElement(string $key): Element
+    public function getElement(string $key): ?Element
     {
         return ($this->elements[$key] ?? null);
     }
@@ -166,12 +166,7 @@ class Document
         }
         return $this->html;
     }
-
-    protected function elemHasEnding(string $elem): bool
-    {
-        return (bool)(in_array($elem, $this::TAG_NO_ENDING));
-    }
-
+    
     /**
      * Build document
      * @param  array         $arr  elements
@@ -207,5 +202,15 @@ class Document
         if (!is_null($call)) {
             $call($elemObj, $key, $hasNoEnding);
         }
+    }
+
+    /**
+     * Validate if element has ending
+     * @param  string $elem
+     * @return bool
+     */
+    final protected function elemHasEnding(string $elem): bool
+    {
+        return (in_array($elem, $this::TAG_NO_ENDING));
     }
 }

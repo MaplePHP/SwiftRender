@@ -43,17 +43,17 @@ interface JsonInterface
      * Convert json array to json string
      * @param  int  $options Bitmask
      * @param  int $depth   Set the maximum depth. Must be greater than zero
-     * @return json/bool (bool if could not load json data)
+     * @return string|null (bool if could not load json data)
      */
-    public function encode(int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): string;
+    public function encode(int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): string|null;
 
     /**
      * Decode json data
-     * @param  string  $json    Json data
-     * @param  boolean $assoc   When TRUE, returned objects will be converted into associative arrays.
-     * @return array/bool       Resturns as array or false if error occoured.
+     * @param  string  $json        Json data
+     * @param  boolean $assoc       When TRUE, returned objects will be converted into associative arrays.
+     * @return object|array|false   Resturns as array or false if error occoured.
      */
-    public function decode($json, $assoc = true): object;
+    public function decode($json, $assoc = true): object|array|false;
 
     /**
      * Validate output

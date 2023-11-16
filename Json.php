@@ -32,7 +32,7 @@ class Json implements JsonInterface
 
     public function __toString(): string
     {
-        return $this->encode();
+        return (string)$this->encode();
     }
 
     /**
@@ -89,7 +89,7 @@ class Json implements JsonInterface
      * Merge string to json array
      * @param string $key   Set array key
      * @param mixed $value Set array value
-     * @return self
+     * @return array
      */
     public function item(...$args): array
     {
@@ -100,30 +100,36 @@ class Json implements JsonInterface
                 $args = $args[0];
             }
         }
-        $argumnets = (!is_null($key)) ? [[$key => $args]] : [...$args];
+        $argumnets = (!is_null($key)) ? [[$key => $args]] : $args;
         $this->data = array_merge($this->data, $argumnets);
         return reset($argumnets);
     }
 
     /**
      * Merge string to json array
-     * @param string $key   Set array key
-     * @param mixed $value Set array value
+     * @param string|array $key   Set array key
+     * @param array $args Set array value
      * @return self
      */
-    public function field($key, $args): self
+    public function field(string|array $key, array $args): self
     {
-        if (is_array($key)) {
+        if (is_array($key) && count($key) > 0) {
             $key = key($key);
+
+            if (!is_string($key)) {
+                throw new \Exception("The key need to be string value", 1);
+            }
+
             $this->fields = array_merge($this->fields, [$key => [
                 "type" => $key,
                 ...$args
             ]]);
         } else {
+            if (!is_string($key)) {
+                throw new \Exception("The key need to be string value", 1);
+            }
             $this->fields = array_merge($this->fields, [$key => $args]);
         }
-
-
         return $this;
     }
 
@@ -185,20 +191,20 @@ class Json implements JsonInterface
      * Convert json array to json string
      * @param  int  $options    Bitmask
      * @param  int  $depth       Set the maximum depth. Must be greater than zero
-     * @return json/bool        (bool if could not load json data)
+     * @return string|null        (bool if could not load json data)
      */
-    public function encode(int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): string
+    public function encode(int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
     {
         return self::encodeData($this->data, $options, $depth);
     }
 
     /**
      * Decode json data
-     * @param  string  $json    Json data
-     * @param  boolean $assoc   When TRUE, returned objects will be converted into associative arrays.
-     * @return array/bool       Resturns as array or false if error occoured.
+     * @param  string  $json        Json data
+     * @param  boolean $assoc       When TRUE, returned objects will be converted into associative arrays.
+     * @return object|array|false   Resturns as array or false if error occoured.
      */
-    public function decode($json, $assoc = true): object
+    public function decode($json, $assoc = true): object|array|false
     {
         if ($array = json_decode($json, $assoc)) {
             return $array;
@@ -247,7 +253,7 @@ class Json implements JsonInterface
      */
     final protected static function encodeData(array $json, int $flag = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
     {
-        if (is_array($json) && count($json) > 0 && ($encode = json_encode($json, $flag, $depth))) {
+        if (count($json) > 0 && ($encode = json_encode($json, $flag, $depth))) {
             return $encode;
         }
         return null;

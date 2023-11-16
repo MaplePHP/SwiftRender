@@ -82,7 +82,8 @@ class SwiftRender
 
     /**
      * Set a default file ending (".php" is pre defined)
-     * @param self
+     * @param string $ending
+     * @return self
      */
     public function setFileEnding(string $ending): self
     {
@@ -93,7 +94,8 @@ class SwiftRender
     /**
      * Customize template file.
      * (Call this if you want to bind for multiple file to same partial)
-     * @param self
+     * @param string $file
+     * @return self
      */
     public function setFile(string $file): self
     {
@@ -151,7 +153,7 @@ class SwiftRender
 
     /**
      * Create a index view
-     * @param  string $file Filename
+     * @param  string|callable $file Filename
      * @return self
      */
     public function setIndex(string|callable $file): self
@@ -178,7 +180,7 @@ class SwiftRender
 
     /**
      * Create a Main view
-     * @param  string $file Filename
+     * @param  string|callable $file Filename
      * @param  array  $args Pass on argummets to template
      * @return self
      */
@@ -207,9 +209,9 @@ class SwiftRender
 
     /**
      * Create a partial view
-     * @param string $keyA Filename/key
-     * @param array  $keyB Args/filename
-     * @param array  $keyC Args
+     * @param string $keyA          Filename/key
+     * @param string|array $keyB    Args/filename
+     * @param array  $keyC          Args
      */
     public function setPartial(string $keyA, string|array $keyB = array(), array $keyC = array()): self
     {
@@ -257,10 +259,11 @@ class SwiftRender
 
     /**
      * IF find in specified Bind Array the it will return the view
-     * @param  string|int|float $find
-     * @return [type]       [description]
+     * @param  string|int   $find
+     * @param  bool     $overwrite
+     * @return void
      */
-    public function findBind($find, bool $overwrite = false): void
+    public function findBind(string|int $find, bool $overwrite = false): void
     {
         if (!is_null($this->bindArr) && ($overwrite || is_null($this->bindView))) {
             foreach ($this->bindArr as $get => $arr) {
@@ -275,7 +278,7 @@ class SwiftRender
 
     /**
      * Prepare index for return
-     * @param  boolean $args Overwrite arguments
+     * @param  array|null $args Overwrite arguments
      * @return self
      */
     public function index(?array $args = null): self
@@ -380,7 +383,7 @@ class SwiftRender
      * Build and Contain template and data until it's executed,
      * this means that code is prepared and will not take any extra memory if view would not be called.
      * So you can if you want prepare a bunch of partial views and just call the the ones you want
-     * @param  string $file the filename
+     * @param  string|callable $file the filename
      * @param  array  $args  Pass arguments to template
      * @return callable
      */
@@ -398,7 +401,7 @@ class SwiftRender
                     }
                 } else {
                     $filePath = "{$dir}{$file}.{$this->ending}";
-                    if (is_string($filePath) && is_file($filePath)) {
+                    if (is_file($filePath)) {
                         if (is_array($argsFromFile) && count($argsFromFile) > 0) {
                             $args = $argsFromFile;
                         }
@@ -424,7 +427,7 @@ class SwiftRender
      */
     public function partialExists($key): bool
     {
-        return (bool)isset($this->partial[$key]);
+        return isset($this->partial[$key]);
     }
 
     /**
@@ -434,7 +437,7 @@ class SwiftRender
      */
     public function exists(string $key): bool
     {
-        return (bool)(in_array($key, $this::VIEWS) && isset($this->{$key}));
+        return (in_array($key, $this::VIEWS) && isset($this->{$key}));
     }
 
     /**
@@ -444,7 +447,7 @@ class SwiftRender
      */
     private function existAtGet(string $key): bool
     {
-        return (bool)(isset($this->{$key}) && $this->get === $key);
+        return (isset($this->{$key}) && $this->get === $key);
     }
 
     /**
@@ -464,20 +467,25 @@ class SwiftRender
     {
         return Document::dom($key);
     }
+
     public function createTag(string $element, string $value, ?array $attr = null)
     {
         $inst = new Document();
-        $elem = $inst->create($element, $value)->attrArr($attr);
+        $elem = $inst->create($element, $value);
+        if (!($elem instanceof Element)) {
+            throw new \Exception("Could not find connection to Element instance", 1);
+        }
+        $elem = $elem->attrArr($attr);
         return $elem;
     }
 
     public function isDoc($elem): bool
     {
-        return (bool)($elem instanceof Document || $elem instanceof Element);
+        return ($elem instanceof Document || $elem instanceof Element);
     }
 
     public function isEl($elem): bool
     {
-        return (bool)($elem instanceof Element);
+        return ($elem instanceof Element);
     }
 }
