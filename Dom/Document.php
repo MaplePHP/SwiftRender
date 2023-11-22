@@ -108,10 +108,9 @@ class Document
         if (is_null($this->elements)) {
             $this->elements = array();
         }
-
         if (!is_null($bind)) {
-            $new[$bind] = $inst;
-            $this->elements = array_merge($new, $this->elements);
+            //$new[$bind] = $inst;
+            $this->elements = array_merge([$bind => $inst], $this->elements);
         } else {
             $this->elements = array_merge([$inst], $this->elements);
         }

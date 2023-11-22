@@ -253,6 +253,9 @@ class Json implements JsonInterface
      */
     final protected static function encodeData(array $json, int $flag = JSON_UNESCAPED_UNICODE, int $depth = 512): ?string
     {
+        if (!($depth > 0 && $depth <= 2147483647)) {
+            throw new \Exception("The json encode depth need to be min 1 and max 2147483647!", 1);
+        }
         if (count($json) > 0 && ($encode = json_encode($json, $flag, $depth))) {
             return $encode;
         }

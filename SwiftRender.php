@@ -198,7 +198,7 @@ class SwiftRender
      * Keep prev view immutable and create a new one.
      * @param  string $file [description]
      * @param  array  $args [description]
-     * @return static
+     * @return self
      */
     public function withView(string $file, array $args = array()): self
     {
@@ -411,7 +411,8 @@ class SwiftRender
                     }
                 }
             } else {
-                throw new Exception("You need to call @" . str_replace("_", "", $this->get) .
+                $file = (is_string($file)) ? $file : "[Callable]";
+                throw new Exception("You need to call @" . str_replace("_", "", (string)$this->get) .
                     "DIR and specify dir path for {$file}.", 1);
             }
         };
