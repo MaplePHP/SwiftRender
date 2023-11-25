@@ -36,6 +36,22 @@ class Json implements JsonInterface
     }
 
     /**
+     * New json instance
+     * @param  array|string $data
+     * @return self
+     */
+    public function withData(array|string $data): self
+    {
+        $inst = new self();
+        if(is_array($data)) {
+            $inst->data = array_merge($this->data, $data);
+        } else {
+            $inst->data = $this->decode($data);
+        }
+        return $inst;
+    }
+
+    /**
      * Merge array to json array
      * @param  array  $array
      * @return self
@@ -222,7 +238,7 @@ class Json implements JsonInterface
         if (!is_null($error)) {
             throw new \Exception($error, self::error());
         }
-        throw new \Exception('An unexpected Json error has occurred', self::error());
+        //throw new \Exception('An unexpected Json error has occurred', self::error());
     }
 
     /**
