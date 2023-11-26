@@ -15,8 +15,8 @@ One time setup to use through the application.
 
 ```php
 
-use PHPFuse\Output\SwiftRender;
-use PHPFuse\DTO\Format;
+use MaplePHP\Output\SwiftRender;
+use MaplePHP\DTO\Format;
 
 $swift = new SwiftRender();
 
@@ -64,7 +64,7 @@ The file **/resources/index.php** has already been binded under the initialisati
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- Used to create dynamic HTML tags, explained bellow under the section "Easy DOM manipulation" -->
-	<?php echo \PHPFuse\Output\Dom\Document::dom("head")->execute(); ?>
+	<?php echo \MaplePHP\Output\Dom\Document::dom("head")->execute(); ?>
 </head>
 <body>
 	<?php echo $this->partial("navigation")->get(); ?>
@@ -135,8 +135,8 @@ You can also create a dynamic view that will over write the current view if call
 In this example the current view which is **/resources/views/main** will be replaced with the view **/resources/views/httpStatus.php** when response status code is (403, 404 e.g.).
 
 ```php
-// PHP Fuse framework (PSR response). Just using this in this example to handle status response codes
-use PHPFuse\Http\Response;
+// MaplePHP framework (PSR response). Just using this in this example to handle status response codes
+use MaplePHP\Http\Response;
 
 $swift->bindToBody(
     "httpStatus",
@@ -152,12 +152,12 @@ Advance DOM creation and works great with stuff like the Meta data becouse you c
 
 ```php
 // Advance DOM creation and works great with stuff like the Meta data 
-$dom = PHPFuse\Output\Dom\Document::dom("head");
+$dom = MaplePHP\Output\Dom\Document::dom("head");
 $dom->bindTag("title", "title")->setValue("Meta title");
 $dom->bindTag("meta", "description")->attr("name", "Description")->attr("content", "Lorem ipsum dolor sit amet.");
 
 // Then later in controller you can change the meta title and description
-$head = PHPFuse\Output\Dom\Document::dom("head");
+$head = MaplePHP\Output\Dom\Document::dom("head");
 $head->getElement("title")->setValue("New meta title");
 $head->getElement("description")->attr("content", "New meta description...");
 

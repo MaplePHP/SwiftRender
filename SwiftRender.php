@@ -1,22 +1,22 @@
 <?php
 
 /**
- * @Package:    PHPFuse - Output Container
+ * @Package:    MaplePHP - Output Container
  * @Author:     Daniel Ronkainen
- * @Licence:    The MIT License (MIT), Copyright © Daniel Ronkainen
+ * @Licence:    Apache-2.0 license, Copyright © Daniel Ronkainen
                 Don't delete this comment, its part of the license.
  * @Version:    2.0.1
  */
 
-namespace PHPFuse\Output;
+namespace MaplePHP\Output;
 
-use PHPFuse\Container\Interfaces\ContainerInterface;
+use MaplePHP\Container\Interfaces\ContainerInterface;
 use Exception;
 use BadMethodCallException;
-use PHPFuse\DTO\Format\Str;
-use PHPFuse\DTO\Traverse;
-use PHPFuse\Output\Dom\Document;
-use PHPFuse\Output\Dom\Element;
+use MaplePHP\DTO\Format\Str;
+use MaplePHP\DTO\Traverse;
+use MaplePHP\Output\Dom\Document;
+use MaplePHP\Output\Dom\Element;
 
 class SwiftRender
 {

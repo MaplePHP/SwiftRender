@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PHPFuse\Output;
+namespace MaplePHP\Output;
 
-use PHPFuse\Output\Interfaces\JsonInterface;
+use MaplePHP\Output\Interfaces\JsonInterface;
 
 class Json implements JsonInterface
 {

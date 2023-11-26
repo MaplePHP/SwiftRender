@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPFuse\Output\Interfaces;
+namespace MaplePHP\Output\Interfaces;
 
 interface JsonInterface
 {
