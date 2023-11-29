@@ -9,7 +9,10 @@
 
 namespace MaplePHP\Output\Dom;
 
-class Document
+use MaplePHP\Output\Interfaces\DocumentInterface;
+use MaplePHP\Output\Interfaces\ElementInterface;
+
+class Document implements DocumentInterface
 {
     public const TAG_NO_ENDING = [
         "meta",
@@ -30,6 +33,10 @@ class Document
     private $elem;
     private static $inst;
 
+    /**
+     * Will output get
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->get();
@@ -39,7 +46,7 @@ class Document
      * Get get Dom/document (Will only trigger execute once per instance)
      * @return string
      */
-    public function get()
+    public function get(): string
     {
         if (is_null($this->html)) {
             $this->execute();
@@ -52,7 +59,7 @@ class Document
      * @param  string $key DOM access key
      * @return self
      */
-    public static function dom(string $key)
+    public static function dom(string $key): self
     {
         if (empty(self::$inst[$key])) {
             self::$inst[$key] = new self();
@@ -65,9 +72,9 @@ class Document
      * @param  string       $tag     HTML tag (without brackets)
      * @param  string       $key     Bind tag to key
      * @param  bool|boolean $prepend Prepend instead of append
-     * @return self
+     * @return ElementInterface
      */
-    public function bindTag(string $tag, string $key, bool $prepend = false)
+    public function bindTag(string $tag, string $key, bool $prepend = false): ElementInterface
     {
         if ($prepend) {
             $this->elem = $this->createPrepend($tag, null, $key);
@@ -81,9 +88,9 @@ class Document
      * Create (append) element
      * @param  string $element HTML tag (without brackets)
      * @param  string $value   add value to tag
-     * @return self
+     * @return ElementInterface
      */
-    public function create($element, $value = null, ?string $bind = null)
+    public function create($element, $value = null, ?string $bind = null): ElementInterface
     {
         $inst = new Element($element, $value);
 
@@ -100,9 +107,9 @@ class Document
      * Prepend element first
      * @param  string $element HTML tag (without brackets)
      * @param  string $value   add value to tag
-     * @return self
+     * @return ElementInterface
      */
-    public function createPrepend(string $element, ?string $value = null, ?string $bind = null)
+    public function createPrepend(string $element, ?string $value = null, ?string $bind = null): ElementInterface
     {
         $inst = new Element($element, $value);
         if (is_null($this->elements)) {
@@ -120,9 +127,9 @@ class Document
 
     /**
      * Get one element from key
-     * @return Element|null
+     * @return ElementInterface|null
      */
-    public function getElement(string $key): ?Element
+    public function getElement(string $key): ?ElementInterface
     {
         return ($this->elements[$key] ?? null);
     }
@@ -131,7 +138,7 @@ class Document
      * Get all elements
      * @return array
      */
-    public function getElements()
+    public function getElements(): array
     {
         return $this->elements;
     }
@@ -151,7 +158,7 @@ class Document
      * @param  callable|null $call Can be used to manipulate element within feed
      * @return string
      */
-    public function execute(?callable $call = null)
+    public function execute(?callable $call = null): string
     {
         $this->html = "";
         if (is_null($this->elements)) {

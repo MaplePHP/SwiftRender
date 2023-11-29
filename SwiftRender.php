@@ -5,7 +5,6 @@
  * @Author:     Daniel Ronkainen
  * @Licence:    Apache-2.0 license, Copyright © Daniel Ronkainen
                 Don't delete this comment, its part of the license.
- * @Version:    2.0.1
  */
 
 namespace MaplePHP\Output;

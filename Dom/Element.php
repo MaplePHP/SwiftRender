@@ -10,9 +10,10 @@
 
 namespace MaplePHP\Output\Dom;
 
+use MaplePHP\Output\Interfaces\ElementInterface;
 use BadMethodCallException;
 
-class Element extends Document
+class Element extends Document implements ElementInterface
 {
     private $elem;
     private $attr = array();
@@ -91,7 +92,7 @@ class Element extends Document
      * @param  string $sep
      * @return self
      */
-    public function attrAdd(string $key, string $value, string $sep = " "): self
+    public function addAttr(string $key, string $value, string $sep = " "): self
     {
         if (isset($this->attr[$key])) {
             $this->attr[$key] .= "{$sep}{$value}";
@@ -99,12 +100,6 @@ class Element extends Document
             $this->attr[$key] = $value;
         }
         return $this;
-    }
-
-    // Same as above
-    public function attrAddTo(string $key, string $value, string $sep = " "): self
-    {
-        return $this->attrAdd($key, $value, $sep);
     }
 
     /**
@@ -137,6 +132,20 @@ class Element extends Document
     }
 
     /**
+     * With cloned element or new element if is specifed
+     * @param  string|null $elem
+     * @return self
+     */
+    public function withElement(?string $elem = null): self
+    {
+        $inst = clone $this;
+        if (!is_null($elem)) {
+            $inst->elem = $elem;
+        }
+        return $inst;
+    }
+
+    /**
      * Array attr to string
      * @return string
      */
@@ -152,19 +161,5 @@ class Element extends Document
             }
         }
         return $attr;
-    }
-
-    /**
-     * With cloned element or new element if is specifed
-     * @param  string|null $elem
-     * @return self
-     */
-    public function withElement(?string $elem = null): self
-    {
-        $inst = clone $this;
-        if (!is_null($elem)) {
-            $inst->elem = $elem;
-        }
-        return $inst;
     }
 }

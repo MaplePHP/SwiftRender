@@ -1,0 +1,29 @@
+{
+    "name": "maplephp/swiftrender",
+    "type": "library",
+    "description": "PHP SwiftRender is a pure and highly portable PHP template library.",
+    "keywords": ["output buffer", "template", "engine", "partials", "components", "views"],
+    "homepage": "https://wazabii.se",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Daniel Ronkainen",
+            "email": "daniel.ronkainen@wazabii.se"
+        },
+        {
+            "name": "MaplePHP",
+            "homepage": "https://wazabii.se"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "maplephp/dto": "^1.0",
+        "maplephp/container": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MaplePHP\\Output\\": ""
+        }
+    },
+    "minimum-stability": "dev"
+}
