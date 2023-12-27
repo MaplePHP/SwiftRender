@@ -208,11 +208,45 @@ class SwiftRender
 
     /**
      * Create a partial view
+     * @param string $file          Filename
+     * @param string $partial       partial/key
+     * @param array  $args          Args
+     */
+    public function setPartial(string $partial, array $args = array()): self
+    {
+
+        $file = $key2 = $key = $partial;
+
+        $partial = explode(".", $file);
+        if(count($partial) > 1) {
+            $key2 = $file = $partial[1];
+            $key = $partial[0];
+
+            if(isset($partial[2])) {
+                $key2 = "{$key}-{$partial[2]}";
+
+            }
+        }
+        
+        if (is_null($this->file)) {
+            $this->setFile($file);
+        }
+        $func = $this->build($this->file, $args);
+
+
+
+        $this->partial[$key][$key2] = $func;
+        
+        return $this;
+    }
+
+    /**
+     * Create a partial view
      * @param string $keyA          Filename/key
      * @param string|array $keyB    Args/filename
      * @param array  $keyC          Args
      */
-    public function setPartial(string $keyA, string|array $keyB = array(), array $keyC = array()): self
+    public function setPartialOLD(string $keyA, string|array $keyB = array(), array $keyC = array()): self
     {
         $partial = $keyB;
         if (is_array($keyB)) {
@@ -224,7 +258,19 @@ class SwiftRender
             $this->setFile($keyA);
         }
         $func = $this->build($this->file, $keyC);
-        $this->partial[$partial][] = $func;
+
+        if(empty($this->partial[$partial]) || is_string($keyB)) {
+            if(is_string($partial) && $partial[0] === "!") {
+                $partial = substr($partial, 1);
+                $this->partial[$partial] = [$func];
+
+            } else {
+                $this->partial[$partial][] = $func;
+            }
+
+        } else {
+            $this->partial[$partial] = [$func];
+        }
         return $this;
     }
 
