@@ -445,14 +445,30 @@ class SwiftRender
                         echo $out;
                     }
                 } else {
-                    $filePath = "{$dir}{$file}.{$this->ending}";
-                    if (is_file($filePath)) {
-                        if (is_array($argsFromFile) && count($argsFromFile) > 0) {
-                            $args = $argsFromFile;
+
+                    $throwError = true;
+                    $missingFiles = array();
+                    $files = explode("|", $file);
+
+                    foreach($files as $file) {
+                        if($file[0] === "!") {
+                            $file = substr($file, 1);
+                            $throwError = false;
                         }
-                        $this->inclRouterFileData($filePath, Traverse::value($args), $args);
-                    } else {
-                        throw new Exception("Could not require template file add {$this->get}: {$dir}{$file}.", 1);
+                        $filePath = "{$dir}{$file}.{$this->ending}";
+                        if (is_file($filePath)) {
+                            if (is_array($argsFromFile) && count($argsFromFile) > 0) {
+                                $args = $argsFromFile;
+                            }
+                            $this->inclRouterFileData($filePath, Traverse::value($args), $args);
+                            break;
+
+                        } else {
+                            $missingFiles[] = $file;
+                        }
+                    }
+                    if($throwError && count($missingFiles) > 0) {
+                        throw new Exception("Could not require template \"{$this->get}\" files: ".implode(", ", $missingFiles).".", 1);
                     }
                 }
             } else {
