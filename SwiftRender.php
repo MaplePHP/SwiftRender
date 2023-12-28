@@ -74,9 +74,18 @@ class SwiftRender
      * Get container instance
      * @return ContainerInterface
      */
-    public function getContainer(): ContainerInterface
+    public function provider(): ContainerInterface
     {
         return $this->container;
+    }
+
+    /**
+     * Get container instance
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->provider();
     }
 
     /**
@@ -232,45 +241,8 @@ class SwiftRender
             $this->setFile($file);
         }
         $func = $this->build($this->file, $args);
-
-
-
         $this->partial[$key][$key2] = $func;
         
-        return $this;
-    }
-
-    /**
-     * Create a partial view
-     * @param string $keyA          Filename/key
-     * @param string|array $keyB    Args/filename
-     * @param array  $keyC          Args
-     */
-    public function setPartialOLD(string $keyA, string|array $keyB = array(), array $keyC = array()): self
-    {
-        $partial = $keyB;
-        if (is_array($keyB)) {
-            $keyC = $keyB;
-            $partial = $keyA;
-        }
-
-        if (is_null($this->file)) {
-            $this->setFile($keyA);
-        }
-        $func = $this->build($this->file, $keyC);
-
-        if(empty($this->partial[$partial]) || is_string($keyB)) {
-            if(is_string($partial) && $partial[0] === "!") {
-                $partial = substr($partial, 1);
-                $this->partial[$partial] = [$func];
-
-            } else {
-                $this->partial[$partial][] = $func;
-            }
-
-        } else {
-            $this->partial[$partial] = [$func];
-        }
         return $this;
     }
 
@@ -455,7 +427,7 @@ class SwiftRender
                             $file = substr($file, 1);
                             $throwError = false;
                         }
-                        $filePath = "{$dir}{$file}.{$this->ending}";
+                        $filePath = realpath("{$dir}{$file}.{$this->ending}");
                         if (is_file($filePath)) {
                             if (is_array($argsFromFile) && count($argsFromFile) > 0) {
                                 $args = $argsFromFile;
@@ -464,6 +436,7 @@ class SwiftRender
                             break;
 
                         } else {
+
                             $missingFiles[] = $file;
                         }
                     }
