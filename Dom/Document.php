@@ -62,8 +62,19 @@ class Document implements DocumentInterface
     public static function dom(string $key): self
     {
         if (empty(self::$inst[$key])) {
-            self::$inst[$key] = new self();
+            self::$inst[$key] = self::withDom($key);
         }
+        return self::$inst[$key];
+    }
+
+    /**
+     * Init DOM instance
+     * @param  string $key DOM access key
+     * @return self
+     */
+    public static function withDom(string $key): self
+    {
+        self::$inst[$key] = new self();
         return self::$inst[$key];
     }
 

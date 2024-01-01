@@ -223,27 +223,20 @@ class SwiftRender
      */
     public function setPartial(string $partial, array $args = array()): self
     {
-
-        $file = $key2 = $key = $partial;
-
-        $partial = explode(".", $file);
-        if(count($partial) > 1) {
-            $key2 = $file = $partial[1];
-            $key = $partial[0];
-
-            if(isset($partial[2])) {
-                $key2 = "{$key}-{$partial[2]}";
-
-            }
-        }
-        
+        $keys = $this->selectPartial($partial, $file);
         if (is_null($this->file)) {
             $this->setFile($file);
         }
         $func = $this->build($this->file, $args);
-        $this->partial[$key][$key2] = $func;
+        $this->partial[$keys[0]][$keys[1]] = $func;
         
         return $this;
+    }
+
+    public function hasPartial($partial): bool
+    {
+        $keys = $this->selectPartial($partial);
+        return isset($this->partial[$keys[0]][$keys[1]]);
     }
 
     /**
@@ -406,10 +399,8 @@ class SwiftRender
      */
     private function build(string|callable $file, array $args = array()): callable
     {
-
         $this->arguments = $args;
         $func = function ($argsFromFile) use ($file, $args) {
-
             if (($dir = ($this->dir[$this->get] ?? null)) || !is_null($dir)) {
                 if (is_callable($file)) {
                     $out = $file($this, $args);
@@ -522,5 +513,45 @@ class SwiftRender
     public function isEl($elem): bool
     {
         return ($elem instanceof Element);
+    }
+
+
+    /**
+     * Get partial keys
+     * @param  string      $partialKey
+     * @param  string|null &$file
+     * @return array
+     */
+    final protected function selectPartial(string $partialKey, ?string &$file = null): array
+    {
+        $key = $partialKey;
+        $partial = explode(".", $partialKey);
+        $file = $key2 = $key = $this->cleanKey($key);
+
+        if (count($partial) > 1) {
+            $key2 = $partial[1];
+            $file = $key2 = $this->cleanKey($key2);
+            $key = $partial[0];
+            if (isset($partial[2])) {
+                $key2 = "{$key}-{$partial[2]}";
+            }
+            if (($pos = strpos($key2, "|")) !== false) {
+                $key2 = substr($key2, 0, $pos);
+            }
+        }
+        return [$key, $key2];
+    }
+
+    /**
+     * Clean key
+     * @param  string $key
+     * @return string
+     */
+    final protected function cleanKey(string $key): string
+    {
+        if(strpos($key, "!") === 0) {
+            return substr($key, 1);
+        }
+        return $key;
     }
 }
