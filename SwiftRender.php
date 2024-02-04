@@ -29,12 +29,12 @@ class SwiftRender
     private $partial;
     private $get;
     private $arg; // Default args
-    private $arguments; // Merge with defualt args
     private $dir;
     private $bind;
     private $bindView;
     private $bindArr;
     private $container;
+    //private $arguments; // Removed
 
     /**
      * Used to build output buffer;
@@ -347,9 +347,11 @@ class SwiftRender
         $output = $this->{$this->get};
 
         // Will merge/replace arguments with current/deafult arguments
+        /*
         if (is_array($args)) {
             $args = array_merge($this->arguments, $args);
         }
+         */
 
         ob_start();
         if (!is_null($this->arg)) {
@@ -399,7 +401,7 @@ class SwiftRender
      */
     private function build(string|callable $file, array $args = array()): callable
     {
-        $this->arguments = $args;
+        //$this->arguments = $args;
         $func = function ($argsFromFile) use ($file, $args) {
             if (($dir = ($this->dir[$this->get] ?? null)) || !is_null($dir)) {
                 if (is_callable($file)) {
@@ -421,13 +423,12 @@ class SwiftRender
                         $filePath = realpath("{$dir}{$file}.{$this->ending}");
                         if (is_file($filePath)) {
                             if (is_array($argsFromFile) && count($argsFromFile) > 0) {
-                                $args = $argsFromFile;
+                                $args = array_merge($args, $argsFromFile);
                             }
                             $this->inclRouterFileData($filePath, Traverse::value($args), $args);
                             break;
 
                         } else {
-
                             $missingFiles[] = $file;
                         }
                     }
@@ -486,6 +487,7 @@ class SwiftRender
      */
     private function inclRouterFileData(string $filePath, object $obj, array $args): void
     {
+        //extract($args);
         include($filePath);
     }
 
