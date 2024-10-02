@@ -46,7 +46,7 @@ $swift->setPartial("article", [
         ]
     ]
 ]);
-// Keep in mind that the data usally comes from the database and that it should/might be called from you controller.
+// Keep in mind that the data usually comes from the database and that it should/might be called from you controller.
 // E.g. $swift->setPartial("article", $mysqli->fetch_objects());
 
 ```
@@ -55,7 +55,7 @@ $swift->setPartial("article", [
 
 #### Index
 
-The file **/resources/index.php** has already been binded under the initialisation section above **$swift->setIndex("index")**. The file looks like this:
+The file **/resources/index.php** has already been bounded under the initialisation section above **$swift->setIndex("index")**. The file looks like this:
 
 ```html
 <!DOCTYPE html>
@@ -63,7 +63,8 @@ The file **/resources/index.php** has already been binded under the initialisati
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Used to create dynamic HTML tags, explained bellow under the section "Easy DOM manipulation" -->
+	<!-- Used to create dynamic HTML tags, the below will create the metadata
+	explained bellow under the section "Easy DOM manipulation" -->
 	<?php echo \MaplePHP\Output\Dom\Document::dom("head")->execute(); ?>
 </head>
 <body>
@@ -76,7 +77,7 @@ The file **/resources/index.php** has already been binded under the initialisati
 ```
 
 #### View
-The file **/resources/views/main.php** has already been binded under the initialisation section above **$swift->setView("main")**. The file looks like this:
+The file **/resources/views/main.php** has already been bounded under the initialisation section above **$swift->setView("main")**. The file looks like this:
 
 ```html
 <div id="wrapper">
@@ -85,20 +86,20 @@ The file **/resources/views/main.php** has already been binded under the initial
 ```
 
 #### Partial
-The file **/resources/partials/article.php** has already been binded under the initialisation section above **$swift->setPartial("article", ...)**. The file looks like this:
+The file **/resources/partials/article.php** has already been bounded under the initialisation section above **$swift->setPartial("article", ...)**. The file looks like this:
 
 ```html
 <article>
 	<header>
-		<h2><?php echo $obj->name; ?></h2>
-		<h6><?php echo $obj->date("DateTime")->format("Y/m/d"); ?></h6>
-		<p><?php echo $obj->content("Str")->excerpt(20)->get(); ?></p>
+		<h2><?php echo $name; ?></h2>
+		<h6><?php echo $date->clockFormat("Y/m/d"); ?></h6>
+		<p><?php echo $content->stExcerpt(20); ?></p>
 	</header>
-	<?php if($obj->feed()->count() > 0): ?>
+	<?php if($feed->count() > 0): ?>
 	<ul>
-		<?php foreach($obj->feed()->fetch()->get() as $row): ?>
+		<?php foreach($feed->fetch() as $row): ?>
 		<li>
-			<strong><?php echo $row->headline("Str")->ucfirst()->get(); ?></strong><br>
+			<strong><?php echo $row->headline->strUcFirst(); ?></strong><br>
 			<?php echo $row->description; ?>
 		</li>
 		<?php endforeach; ?>
@@ -108,29 +109,29 @@ The file **/resources/partials/article.php** has already been binded under the i
 ```
 
 #### Partial functionality
-The partials all arguments will automatically be converted to a object with alot of extedned functionallity. Here is some:
+The partials all arguments will automatically be converted to an object with a lot of extended functionality. Here is some:
 
 ```php
-echo $obj->date; // 2023-02-30 15:33:22
-echo $obj->date("DateTime")->format("Y/m/d"); // 2023/02/30
+echo $date; // 2023-02-30 15:33:22
+echo $date->clockFormat("Y/m/d"); // 2023/02/30
 // Will strip all html tags, replace regular line breaks with "<br>" and uppercase the first letter
-echo $obj->content("Str")->stripTags()->nl2br()->ucfirst()->get();
+echo $content->strStripTags()->strNl2br()->strUcfirst();
 
 // Loop through an array
-if($obj->feed()->count() > 0) foreach($obj->feed()->fetch()->get() as $row) {
-	echo $row->headline("Str")->ucfirst()->get()."<br>";
+if($feed->count() > 0) foreach($feed->fetch() as $row) {
+	echo $row->headline->strUcFirst() . "<br>";
 }
 ```
 
 #### Run the template engine
-You can run the template engine later in a empty file, emitter or router dipatcher. It all depends on your setup.
+You can run the template engine later in an empty file, emitter or router dispatcher. It all depends on your setup.
 ```php
 echo $swift->index()->get();
 
 ```
 
 #### Dynamic views
-You can also create a dynamic view that will over write the current view if called. This is great for e.g. showing a 404 page. 
+You can also create a dynamic view that will overwrite the current view if called. This is great for e.g. showing a 404 page. 
 
 In this example the current view which is **/resources/views/main** will be replaced with the view **/resources/views/httpStatus.php** when response status code is (403, 404 e.g.).
 
@@ -148,10 +149,10 @@ $swift->findBind($response->getStatusCode());
 ```
 
 #### Easy DOM manipulation
-Advance DOM creation and works great with stuff like the Meta data becouse you can later in change values and attributes in the controller. 
+Advance DOM creation and works great with stuff like the Metadata because you can later in change values and attributes in the controller. 
 
 ```php
-// Advance DOM creation and works great with stuff like the Meta data 
+// Advance DOM creation and works great with stuff like the Metadata 
 $dom = MaplePHP\Output\Dom\Document::dom("head");
 $dom->bindTag("title", "title")->setValue("Meta title");
 $dom->bindTag("meta", "description")->attr("name", "Description")->attr("content", "Lorem ipsum dolor sit amet.");
@@ -160,5 +161,4 @@ $dom->bindTag("meta", "description")->attr("name", "Description")->attr("content
 $head = MaplePHP\Output\Dom\Document::dom("head");
 $head->getElement("title")->setValue("New meta title");
 $head->getElement("description")->attr("content", "New meta description...");
-
 ```
