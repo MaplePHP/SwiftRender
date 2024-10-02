@@ -40,12 +40,12 @@ interface DocumentInterface
      */
     public function create($element, $value = null, ?string $bind = null): ElementInterface;
 
-     /**
-     * Prepend element first
-     * @param  string $element HTML tag (without brackets)
-     * @param  string $value   add value to tag
-     * @return ElementInterface
-     */
+    /**
+    * Prepend element first
+    * @param  string $element HTML tag (without brackets)
+    * @param  string $value   add value to tag
+    * @return ElementInterface
+    */
     public function createPrepend(string $element, ?string $value = null, ?string $bind = null): ElementInterface;
 
     /**

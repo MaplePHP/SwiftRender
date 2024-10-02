@@ -16,7 +16,7 @@ use BadMethodCallException;
 class Element extends Document implements ElementInterface
 {
     private $elem;
-    private $attr = array();
+    private $attr = [];
     private $snippet;
     private $value;
     private $hideEmptyTag = false;

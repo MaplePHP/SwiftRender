@@ -124,7 +124,7 @@ class Document implements DocumentInterface
     {
         $inst = new Element($element, $value);
         if (is_null($this->elements)) {
-            $this->elements = array();
+            $this->elements = [];
         }
         if (!is_null($bind)) {
             //$new[$bind] = $inst;
@@ -183,7 +183,7 @@ class Document implements DocumentInterface
         }
         return $this->html;
     }
-    
+
     /**
      * Build document
      * @param  array         $arr  elements

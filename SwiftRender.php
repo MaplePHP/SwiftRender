@@ -78,6 +78,16 @@ class SwiftRender
     }
 
     /**
+     * Set a PSR-6 cache instance for partial views, not required
+     * @param CacheInterface $cache
+     * @return void
+     */
+    public function setCache(CacheInterface $cache): void
+    {
+        $this->cache = $cache;
+    }
+
+    /**
      * Get container instance
      * @return ContainerInterface
      */
@@ -202,7 +212,7 @@ class SwiftRender
      * @return self
      * @throws Exception
      */
-    public function setView(string|callable $file, array $args = array()): self
+    public function setView(string|callable $file, array $args = []): self
     {
         if (is_null($this->file) && is_string($file)) {
             $this->setFile($file);
@@ -219,7 +229,7 @@ class SwiftRender
      * @return self
      * @throws Exception
      */
-    public function withView(string $file, array $args = array()): self
+    public function withView(string $file, array $args = []): self
     {
         $inst = clone $this;
         $inst->setView($file, $args);
@@ -234,9 +244,8 @@ class SwiftRender
      * @return SwiftRender
      * @throws Exception
      */
-    public function setPartial(string $partial, array $args = array(), int|false $cacheTime = false): self
+    public function setPartial(string $partial, array $args = [], int|false $cacheTime = false): self
     {
-        $this->partialKey = $partial;
         $keys = $this->selectPartial($partial, $file);
         if (is_null($this->file)) {
             $this->setFile($file);
@@ -273,7 +282,7 @@ class SwiftRender
      * @return self
      * @throws Exception
      */
-    public function bindToBody(string $key, array $bindArr, array $args = array()): self
+    public function bindToBody(string $key, array $bindArr, array $args = []): self
     {
         $this->setFile($key);
         $func = $this->build($this->file, $args);
@@ -413,11 +422,10 @@ class SwiftRender
      */
     private function build(
         string|callable $file,
-        array $args = array(),
+        array $args = [],
         ?string $partialKey = null,
         int|false $cacheTime = false
-    ): callable
-    {
+    ): callable {
 
         if(is_null($this->cache) && $cacheTime !== false) {
             throw new Exception("Cache is not configured");
@@ -433,7 +441,7 @@ class SwiftRender
                 } else {
 
                     $throwError = true;
-                    $missingFiles = array();
+                    $missingFiles = [];
                     $files = explode("|", $file);
 
                     foreach($files as $file) {
@@ -484,8 +492,7 @@ class SwiftRender
         ?string $partialKey = null,
         array $args = [],
         int|false $cacheTime = false
-    ): void
-    {
+    ): void {
         if($this->get == "partial" && !is_null($this->cache) && $cacheTime !== false) {
             $partialKey = str_replace(["!", "/"], ["", "_"], $partialKey);
             $updateTime = filemtime($filePath);
@@ -552,7 +559,7 @@ class SwiftRender
      */
     private function inclRouterFileData(string $filePath, object $obj, array $args): void
     {
-        $extract = ($obj instanceof Traverse) ? $obj->toArray(function($row) {
+        $extract = ($obj instanceof Traverse) ? $obj->toArray(function ($row) {
             return Traverse::value($row);
         }) : $args;
         extract($extract);
