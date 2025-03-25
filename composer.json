@@ -1,7 +1,7 @@
 {
     "name": "maplephp/swiftrender",
     "type": "library",
-    "version": "v2.0.0",
+    "version": "v2.0.1",
     "description": "PHP SwiftRender is a pure and highly portable PHP template library.",
     "keywords": ["output buffer", "template", "engine", "partials", "components", "views"],
     "homepage": "https://wazabii.se",
@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "maplephp/dto": "^2.0",
+        "maplephp/dto": "^3.0",
         "maplephp/container": "^1.0"
     },
     "autoload": {

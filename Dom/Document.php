@@ -97,8 +97,10 @@ class Document implements DocumentInterface
 
     /**
      * Create (append) element
-     * @param  string $element HTML tag (without brackets)
-     * @param  string $value   add value to tag
+     *
+     * @param string $element HTML tag (without brackets)
+     * @param null $value add value to tag
+     * @param string|null $bind
      * @return ElementInterface
      */
     public function create($element, $value = null, ?string $bind = null): ElementInterface
@@ -172,6 +174,7 @@ class Document implements DocumentInterface
     public function execute(?callable $call = null): string
     {
         $this->html = "";
+
         if (is_null($this->elements)) {
             if (method_exists($this, "withElement")) {
                 $inst = $this->withElement();
@@ -181,6 +184,7 @@ class Document implements DocumentInterface
         if (is_array($this->elements)) {
             $this->build($this->elements, $call);
         }
+
         return $this->html;
     }
 
